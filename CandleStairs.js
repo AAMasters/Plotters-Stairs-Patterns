@@ -13,7 +13,7 @@
 
         // Secondary functions and properties.
 
-        currentCandle: undefined,
+        currentStair: undefined,
         onLayerStatusChanged: onLayerStatusChanged
     };
 
@@ -38,7 +38,7 @@
 
     /* these are module specific variables: */
 
-    let candles = [];                   // Here we keep the candles to be ploted every time the Draw() function is called by the AAWebPlatform.
+    let stairsArray = [];              // Here we keep the candle-stairs to be ploted every time the Draw() function is called by the AAWebPlatform.
 
     return thisObject;
 
@@ -233,7 +233,7 @@
 
         }
 
-        thisObject.container.eventHandler.raiseEvent("CandleStairs Changed", candles);
+        thisObject.container.eventHandler.raiseEvent("CandleStairs Changed", stairsArray);
     }
 
     function recalculateUsingDailyFiles() {
@@ -252,7 +252,7 @@
 
         let currentDate = new Date(farLeftDate.valueOf());
 
-        candles = [];
+        stairsArray = [];
 
         while (currentDate.valueOf() <= farRightDate.valueOf() + ONE_DAY_IN_MILISECONDS) {
 
@@ -264,37 +264,47 @@
 
                 for (let i = 0; i < dailyFile.length; i++) {
 
-                    let candle = {
+                    let stairs = {
                         open: undefined,
                         close: undefined,
                         min: 10000000000000,
                         max: 0,
                         begin: undefined,
                         end: undefined,
-                        direction: undefined
+                        direction: undefined,
+                        candleCount: 0,
+                        firstMin: 0,
+                        firstMax: 0,
+                        lastMin: 0,
+                        lastMax: 0
                     };
 
-                    candle.min = dailyFile[i][0];
-                    candle.max = dailyFile[i][1];
+                    stairs.open = dailyFile[i][0];
+                    stairs.close = dailyFile[i][1];
 
-                    candle.open = dailyFile[i][2];
-                    candle.close = dailyFile[i][3];
+                    stairs.min = dailyFile[i][2];
+                    stairs.max = dailyFile[i][3];
 
-                    candle.begin = dailyFile[i][4];
-                    candle.end = dailyFile[i][5];
+                    stairs.begin = dailyFile[i][4];
+                    stairs.end = dailyFile[i][5];
 
-                    if (candle.open > candle.close) { candle.direction = 'down'; }
-                    if (candle.open < candle.close) { candle.direction = 'up'; }
-                    if (candle.open === candle.close) { candle.direction = 'side'; }
+                    stairs.direction = dailyFile[i][6];
+                    stairs.candleCount = dailyFile[i][7];
 
-                    if (candle.begin >= farLeftDate.valueOf() && candle.end <= farRightDate.valueOf()) {
+                    stairs.firstMin = dailyFile[i][8];
+                    stairs.firstMax = dailyFile[i][9];
 
-                        candles.push(candle);
+                    stairs.lastMin = dailyFile[i][10];
+                    stairs.lastMax = dailyFile[i][11];
 
-                        if (datetime.valueOf() >= candle.begin && datetime.valueOf() <= candle.end) {
+                    if (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) {
 
-                            thisObject.currentCandle = candle;
-                            thisObject.container.eventHandler.raiseEvent("Current Candle Changed", thisObject.currentCandle);
+                        stairsArray.push(stairs);
+
+                        if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+
+                            thisObject.currentStair = stairs;
+                            thisObject.container.eventHandler.raiseEvent("Current Candle-Stairs Changed", thisObject.currentStair);
 
                         }
                     }
@@ -304,23 +314,21 @@
             currentDate = new Date(currentDate.valueOf() + ONE_DAY_IN_MILISECONDS);
         }
 
-        /* Lests check if all the visible screen is going to be covered by candles. */
+        /* Lests check if all the visible screen is going to be covered by candle-stairs. */
 
         let lowerEnd = leftDate.valueOf();
         let upperEnd = rightDate.valueOf();
 
-        if (candles.length > 0) {
+        if (stairsArray.length > 0) {
 
-            if (candles[0].begin > lowerEnd || candles[candles.length - 1].end < upperEnd) {
+            if (stairsArray[0].begin > lowerEnd || stairsArray[stairsArray.length - 1].end < upperEnd) {
 
                 setTimeout(recalculate, 2000);
 
-                //console.log("File missing while calculating candles, scheduling a recalculation in 2 seconds.");
+                //console.log("File missing while calculating candle-stairs, scheduling a recalculation in 2 seconds.");
 
             }
         }
-
-        //console.log("Olivia > recalculateUsingDailyFiles > total candles generated : " + candles.length);
 
     }
 
@@ -338,47 +346,55 @@
         leftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
         rightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
 
-        candles = [];
+        stairsArray = [];
 
         for (let i = 0; i < marketFile.length; i++) {
 
-            let candle = {
+            let stairs = {
                 open: undefined,
                 close: undefined,
                 min: 10000000000000,
                 max: 0,
                 begin: undefined,
                 end: undefined,
-                direction: undefined
+                direction: undefined,
+                candleCount: 0,
+                firstMin: 0,
+                firstMax: 0,
+                lastMin: 0,
+                lastMax: 0
             };
 
-            candle.min = marketFile[i][0];
-            candle.max = marketFile[i][1];
+            stairs.open = marketFile[i][0];
+            stairs.close = marketFile[i][1];
 
-            candle.open = marketFile[i][2];
-            candle.close = marketFile[i][3];
+            stairs.min = marketFile[i][2];
+            stairs.max = marketFile[i][3];
 
-            candle.begin = marketFile[i][4];
-            candle.end = marketFile[i][5];
+            stairs.begin = marketFile[i][4];
+            stairs.end = marketFile[i][5];
 
-            if (candle.open > candle.close) { candle.direction = 'down'; }
-            if (candle.open < candle.close) { candle.direction = 'up'; }
-            if (candle.open === candle.close) { candle.direction = 'side'; }
+            stairs.direction = marketFile[i][6];
+            stairs.candleCount = marketFile[i][7];
 
-            if (candle.begin >= leftDate.valueOf() && candle.end <= rightDate.valueOf()) {
+            stairs.firstMin = marketFile[i][8];
+            stairs.firstMax = marketFile[i][9];
 
-                candles.push(candle);
+            stairs.lastMin = marketFile[i][10];
+            stairs.lastMax = marketFile[i][11];
 
-                if (datetime.valueOf() >= candle.begin && datetime.valueOf() <= candle.end) {
+            if (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) {
 
-                    thisObject.currentCandle = candle;
-                    thisObject.container.eventHandler.raiseEvent("Current Candle Changed", thisObject.currentCandle);
+                stairsArray.push(stairs);
+
+                if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+
+                    thisObject.currentStair = stairs;
+                    thisObject.container.eventHandler.raiseEvent("Current Candle-Stairs Changed", thisObject.currentStair);
 
                 }
             } 
         }
-
-        //console.log("Olivia > recalculateUsingMarketFiles > total candles generated : " + candles.length);
     }
 
     function recalculateScale() {
@@ -426,191 +442,130 @@
 
     function plotChart() {
 
-        if (candles.length > 0) {
+        if (stairsArray.length > 0) {
 
-            /* Now we calculate and plot the candles */
+            for (var i = 0; i < stairsArray.length; i++) {
 
-            for (let i = 0; i < candles.length; i++) {
+                stairs = stairsArray[i];
 
-                candle = candles[i];
+                let stairsPoint1;
+                let stairsPoint2;
+                let stairsPoint3;
+                let stairsPoint4;
 
-                let candlePoint1 = {
-                    x: candle.begin + timePeriod / 7 * 1.5,
-                    y: candle.open
-                };
+                if (stairs.direction === 'up') {
 
-                let candlePoint2 = {
-                    x: candle.begin + timePeriod / 7 * 5.5,
-                    y: candle.open
-                };
+                    stairsPoint1 = {
+                        x: stairs.begin + timePeriod / 7 * 5.5,
+                        y: stairs.firstMin
+                    };
 
-                let candlePoint3 = {
-                    x: candle.begin + timePeriod / 7 * 5.5,
-                    y: candle.close
-                };
+                    stairsPoint2 = {
+                        x: stairs.end - timePeriod / 7 * 1.5,
+                        y: stairs.lastMin
+                    };
 
-                let candlePoint4 = {
-                    x: candle.begin + timePeriod / 7 * 1.5,
-                    y: candle.close
-                };
+                    stairsPoint3 = {
+                        x: stairs.end - timePeriod / 7 * 5.5,
+                        y: stairs.lastMax
+                    };
 
-                candlePoint1 = plotArea.inverseTransform(candlePoint1, thisObject.container.frame.height);
-                candlePoint2 = plotArea.inverseTransform(candlePoint2, thisObject.container.frame.height);
-                candlePoint3 = plotArea.inverseTransform(candlePoint3, thisObject.container.frame.height);
-                candlePoint4 = plotArea.inverseTransform(candlePoint4, thisObject.container.frame.height);
+                    stairsPoint4 = {
+                        x: stairs.begin + timePeriod / 7 * 1.5,
+                        y: stairs.firstMax
+                    };
 
-                candlePoint1 = transformThisPoint(candlePoint1, thisObject.container);
-                candlePoint2 = transformThisPoint(candlePoint2, thisObject.container);
-                candlePoint3 = transformThisPoint(candlePoint3, thisObject.container);
-                candlePoint4 = transformThisPoint(candlePoint4, thisObject.container);
+                } else {
 
-                if (candlePoint2.x < viewPort.visibleArea.bottomLeft.x || candlePoint1.x > viewPort.visibleArea.bottomRight.x) {
+                    stairsPoint1 = {
+                        x: stairs.begin + timePeriod / 7 * 1.5,
+                        y: stairs.firstMin
+                    };
+
+                    stairsPoint2 = {
+                        x: stairs.end - timePeriod / 7 * 5.5,
+                        y: stairs.lastMin
+                    };
+
+                    stairsPoint3 = {
+                        x: stairs.end - timePeriod / 7 * 1.5,
+                        y: stairs.lastMax
+                    };
+
+                    stairsPoint4 = {
+                        x: stairs.begin + timePeriod / 7 * 5.5,
+                        y: stairs.firstMax
+                    };
+                }
+
+                stairsPoint1 = plotArea.inverseTransform(stairsPoint1, thisObject.container.frame.height);
+                stairsPoint2 = plotArea.inverseTransform(stairsPoint2, thisObject.container.frame.height);
+                stairsPoint3 = plotArea.inverseTransform(stairsPoint3, thisObject.container.frame.height);
+                stairsPoint4 = plotArea.inverseTransform(stairsPoint4, thisObject.container.frame.height);
+
+                stairsPoint1 = transformThisPoint(stairsPoint1, thisObject.container);
+                stairsPoint2 = transformThisPoint(stairsPoint2, thisObject.container);
+                stairsPoint3 = transformThisPoint(stairsPoint3, thisObject.container);
+                stairsPoint4 = transformThisPoint(stairsPoint4, thisObject.container);
+
+                if (stairsPoint2.x < viewPort.visibleArea.bottomLeft.x || stairsPoint1.x > viewPort.visibleArea.bottomRight.x) {
                     continue;
                 }
 
-                candlePoint1 = viewPort.fitIntoVisibleArea(candlePoint1);
-                candlePoint2 = viewPort.fitIntoVisibleArea(candlePoint2);
-                candlePoint3 = viewPort.fitIntoVisibleArea(candlePoint3);
-                candlePoint4 = viewPort.fitIntoVisibleArea(candlePoint4);
-
-                let stickPoint1 = {
-                    x: candle.begin + timePeriod / 7 * 3.2,
-                    y: candle.max
-                };
-
-                let stickPoint2 = {
-                    x: candle.begin + timePeriod / 7 * 3.8,
-                    y: candle.max
-                };
-
-                let stickPoint3 = {
-                    x: candle.begin + timePeriod / 7 * 3.8,
-                    y: candle.min
-                };
-
-                let stickPoint4 = {
-                    x: candle.begin + timePeriod / 7 * 3.2,
-                    y: candle.min
-                };
-
-                stickPoint1 = plotArea.inverseTransform(stickPoint1, thisObject.container.frame.height);
-                stickPoint2 = plotArea.inverseTransform(stickPoint2, thisObject.container.frame.height);
-                stickPoint3 = plotArea.inverseTransform(stickPoint3, thisObject.container.frame.height);
-                stickPoint4 = plotArea.inverseTransform(stickPoint4, thisObject.container.frame.height);
-
-                stickPoint1 = transformThisPoint(stickPoint1, thisObject.container);
-                stickPoint2 = transformThisPoint(stickPoint2, thisObject.container);
-                stickPoint3 = transformThisPoint(stickPoint3, thisObject.container);
-                stickPoint4 = transformThisPoint(stickPoint4, thisObject.container);
-
-                stickPoint1 = viewPort.fitIntoVisibleArea(stickPoint1);
-                stickPoint2 = viewPort.fitIntoVisibleArea(stickPoint2);
-                stickPoint3 = viewPort.fitIntoVisibleArea(stickPoint3);
-                stickPoint4 = viewPort.fitIntoVisibleArea(stickPoint4);
+                stairsPoint1 = viewPort.fitIntoVisibleArea(stairsPoint1);
+                stairsPoint2 = viewPort.fitIntoVisibleArea(stairsPoint2);
+                stairsPoint3 = viewPort.fitIntoVisibleArea(stairsPoint3);
+                stairsPoint4 = viewPort.fitIntoVisibleArea(stairsPoint4);
 
                 browserCanvasContext.beginPath();
 
-                browserCanvasContext.moveTo(stickPoint1.x, stickPoint1.y);
-                browserCanvasContext.lineTo(stickPoint2.x, stickPoint2.y);
-                browserCanvasContext.lineTo(stickPoint3.x, stickPoint3.y);
-                browserCanvasContext.lineTo(stickPoint4.x, stickPoint4.y);
+                browserCanvasContext.moveTo(stairsPoint1.x, stairsPoint1.y);
+                browserCanvasContext.lineTo(stairsPoint2.x, stairsPoint2.y);
+                browserCanvasContext.lineTo(stairsPoint3.x, stairsPoint3.y);
+                browserCanvasContext.lineTo(stairsPoint4.x, stairsPoint4.y);
 
                 browserCanvasContext.closePath();
-                browserCanvasContext.fillStyle = 'rgba(54, 54, 54, 1)';
+
+                let opacity = '0.25';
+
+                if (stairs.direction === 'up') { browserCanvasContext.strokeStyle = 'rgba(27, 105, 7, ' + opacity + ')'; }
+                if (stairs.direction === 'down') { browserCanvasContext.strokeStyle = 'rgba(130, 9, 9, ' + opacity + ')'; }
+
+                if (datetime !== undefined) {
+
+                    let dateValue = datetime.valueOf();
+
+                    if (dateValue >= stairs.begin && dateValue <= stairs.end) {
+
+
+                        /* highlight the current stairs */
+
+                        browserCanvasContext.fillStyle = 'rgba(255, 233, 31, 0.1)'; // Current stairs accroding to time
+
+                    } else {
+
+                        if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')'; }
+                        if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')'; }
+                    }
+
+                } else {
+
+                    if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')'; }
+                    if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')'; }
+                }
+
                 browserCanvasContext.fill();
 
-                if (datetime !== undefined) {
-
-                    let dateValue = datetime.valueOf();
-
-                    if (dateValue >= candle.begin && dateValue <= candle.end) {
-
-                        browserCanvasContext.strokeStyle = 'rgba(255, 233, 31, 1)'; // Current candle accroding to time
-
-                    } else {
-                        browserCanvasContext.strokeStyle = 'rgba(212, 206, 201, 1)';
-                    }
-
-                } else {
-                    browserCanvasContext.strokeStyle = 'rgba(212, 206, 201, 1)';
-                }
-
                 browserCanvasContext.lineWidth = 1;
                 browserCanvasContext.stroke();
-
-                browserCanvasContext.beginPath();
-
-                browserCanvasContext.moveTo(candlePoint1.x, candlePoint1.y);
-                browserCanvasContext.lineTo(candlePoint2.x, candlePoint2.y);
-                browserCanvasContext.lineTo(candlePoint3.x, candlePoint3.y);
-                browserCanvasContext.lineTo(candlePoint4.x, candlePoint4.y);
-
-                browserCanvasContext.closePath();
-
-                if (candle.direction === 'up') { browserCanvasContext.strokeStyle = 'rgba(27, 105, 7, 1)'; }
-                if (candle.direction === 'down') { browserCanvasContext.strokeStyle = 'rgba(130, 9, 9, 1)'; }
-                if (candle.direction === 'side') { browserCanvasContext.strokeStyle = 'rgba(27, 7, 105, 1)'; }
-
-                if (datetime !== undefined) {
-
-                    let dateValue = datetime.valueOf();
-
-                    if (dateValue >= candle.begin && dateValue <= candle.end) {
-
-                        /* highlight the current candle */
-
-                        browserCanvasContext.fillStyle = 'rgba(255, 233, 31, 1)'; // Current candle accroding to time
-
-                        let currentCandle = {
-                            bodyWidth: candlePoint2.x - candlePoint1.x,
-                            bodyHeight: candlePoint3.y - candlePoint2.y,
-                            stickHeight: stickPoint4.y - stickPoint2.y,
-                            stickWidth: stickPoint2.x - stickPoint1.x,
-                            stickStart: candlePoint2.y - stickPoint2.y,
-                            period: timePeriod,
-                            innerCandle: candle
-                        };
-
-                        thisObject.container.eventHandler.raiseEvent("Current Candle Info Changed", currentCandle);
-
-                    } else {
-
-                        if (candle.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(64, 217, 26, 1)'; }
-                        if (candle.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(219, 18, 18, 1)'; }
-                        if (candle.direction === 'side') { browserCanvasContext.fillStyle = 'rgba(64, 26, 217, 1)'; }
-                    }
-
-                } else {
-
-                    if (candle.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(64, 217, 26, 1)'; }
-                    if (candle.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(219, 18, 18, 1)'; }
-                    if (candle.direction === 'side') { browserCanvasContext.fillStyle = 'rgba(64, 26, 217, 1)'; }
-
-                }
-
-
-
-                if (
-                    candlePoint1.x < viewPort.visibleArea.topLeft.x + 50
-                    ||
-                    candlePoint1.x > viewPort.visibleArea.bottomRight.x - 50
-                ) {
-                    // we leave this candles without fill.
-                } else {
-                    browserCanvasContext.fill();
-                }
-
-                browserCanvasContext.lineWidth = 1;
-                browserCanvasContext.stroke();
-
-
             }
+
         }
     }
 
     function onLayerStatusChanged(eventData) {
 
-        if (eventData.layer === 'Tom Candlesticks') {
+        if (eventData.layer === 'Tom Candle-Stairs') {
             layerStatus = eventData.status;
         }
 

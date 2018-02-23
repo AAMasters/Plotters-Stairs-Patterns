@@ -38,7 +38,7 @@
 
     /* these are module specific variables: */
 
-    let volumes = [];                   // Here we keep the volumes to be ploted every time the Draw() function is called by the AAWebPlatform.
+    let stairsArray = [];                   // Here we keep the stairsArray to be ploted every time the Draw() function is called by the AAWebPlatform.
 
     return thisObject;
 
@@ -235,7 +235,7 @@
 
         }
 
-        thisObject.container.eventHandler.raiseEvent("Volumes Changed", volumes);
+        thisObject.container.eventHandler.raiseEvent("Volumes Changed", stairsArray);
     }
 
     function recalculateUsingDailyFiles() {
@@ -254,7 +254,7 @@
 
         let currentDate = new Date(farLeftDate.valueOf());
 
-        volumes = [];
+        stairsArray = [];
 
         while (currentDate.valueOf() <= farRightDate.valueOf() + ONE_DAY_IN_MILISECONDS) {
 
@@ -266,24 +266,31 @@
 
                 for (let i = 0; i < dailyFile.length; i++) {
 
-                    let volume = {
-                        amountBuy: 0,
-                        amountSell: 0,
+                    let stairs = {
+                        type: undefined,
                         begin: undefined,
-                        end: undefined
+                        end: undefined,
+                        direction: undefined,
+                        barsCount: 0,
+                        firstAmount: 0,
+                        lastAmount: 0
                     };
 
-                    volume.amountBuy = dailyFile[i][0];
-                    volume.amountSell = dailyFile[i][1];
+                    stairs.type = dailyFile[i][0];
 
-                    volume.begin = dailyFile[i][2];
-                    volume.end = dailyFile[i][3];
+                    stairs.begin = dailyFile[i][1];
+                    stairs.end = dailyFile[i][2];
 
-                    if (volume.begin >= farLeftDate.valueOf() && volume.end <= farRightDate.valueOf()) {
+                    stairs.direction = dailyFile[i][3];
+                    stairs.barsCount = dailyFile[i][4];
+                    stairs.firstAmount = dailyFile[i][5];
+                    stairs.lastAmount = dailyFile[i][6];
 
-                        volumes.push(volume);
+                    if (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) {
 
-                        if (datetime.valueOf() >= volume.begin && datetime.valueOf() <= volume.end) {
+                        stairsArray.push(stairs);
+
+                        if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
 
                             thisObject.container.eventHandler.raiseEvent("Current Candle Changed", thisObject.currentCandle);
 
@@ -295,23 +302,23 @@
             currentDate = new Date(currentDate.valueOf() + ONE_DAY_IN_MILISECONDS);
         }
 
-        /* Lests check if all the visible screen is going to be covered by volumes. */
+        /* Lests check if all the visible screen is going to be covered by stairsArray. */
 
         let lowerEnd = leftDate.valueOf();
         let upperEnd = rightDate.valueOf();
 
-        if (volumes.length > 0) {
+        if (stairsArray.length > 0) {
 
-            if (volumes[0].begin > lowerEnd || volumes[volumes.length - 1].end < upperEnd) {
+            if (stairsArray[0].begin > lowerEnd || stairsArray[stairsArray.length - 1].end < upperEnd) {
 
                 setTimeout(recalculate, 2000);
 
-                //console.log("File missing while calculating volumes, scheduling a recalculation in 2 seconds.");
+                //console.log("File missing while calculating stairsArray, scheduling a recalculation in 2 seconds.");
 
             }
         }
 
-        //console.log("Olivia > recalculateUsingDailyFiles > total volumes generated : " + volumes.length);
+        //console.log("Olivia > recalculateUsingDailyFiles > total stairsArray generated : " + stairsArray.length);
 
     }
 
@@ -329,36 +336,43 @@
         leftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
         rightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
 
-        volumes = [];
+        stairsArray = [];
 
         for (let i = 0; i < marketFile.length; i++) {
 
-            let volume = {
-                amountBuy: 0,
-                amountSell: 0,
+            let stairs = {
+                type: undefined,
                 begin: undefined,
-                end: undefined
+                end: undefined,
+                direction: undefined,
+                barsCount: 0,
+                firstAmount: 0,
+                lastAmount: 0
             };
 
-            volume.amountBuy = marketFile[i][0];
-            volume.amountSell = marketFile[i][1];
+            stairs.type = marketFile[i][0];
 
-            volume.begin = marketFile[i][2];
-            volume.end = marketFile[i][3];
+            stairs.begin = marketFile[i][1];
+            stairs.end = marketFile[i][2];
 
-            if (volume.begin >= leftDate.valueOf() && volume.end <= rightDate.valueOf()) {
+            stairs.direction = marketFile[i][3];
+            stairs.barsCount = marketFile[i][4];
+            stairs.firstAmount = marketFile[i][5];
+            stairs.lastAmount = marketFile[i][6];
 
-                volumes.push(volume);
+            if (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) {
 
-                if (datetime.valueOf() >= volume.begin && datetime.valueOf() <= volume.end) {
+                stairsArray.push(stairs);
 
-                    thisObject.container.eventHandler.raiseEvent("Current Volume Changed", thisObject.currentCandle);
+                if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+
+                    thisObject.container.eventHandler.raiseEvent("Current Volume-Stairs Changed", thisObject.currentCandle);
 
                 }
             }
         }
 
-        //console.log("Olivia > recalculateUsingMarketFiles > total volumes generated : " + volumes.length);
+        //console.log("Olivia > recalculateUsingMarketFiles > total stairsArray generated : " + stairsArray.length);
     }
 
     function recalculateScaleX() {
@@ -418,7 +432,7 @@
 
             for (var i = 0; i < marketFile.length; i++) {
 
-                let currentMax = marketFile[i][0] + marketFile[i][1];
+                let currentMax = (marketFile[i][5] + marketFile[i][6]) * 8;
 
                 if (maxValue < currentMax) {
                     maxValue = currentMax;
@@ -433,311 +447,266 @@
 
     function plotChart() {
 
-        if (volumes.length > 0) {
+        let opacity = '0.25';
 
-            /* Now we calculate and plot the volumes */
+        let visibleHeight = viewPort.visibleArea.bottomRight.y - viewPort.visibleArea.topLeft.y;
 
-            let visibleHeight = viewPort.visibleArea.bottomRight.y - viewPort.visibleArea.topLeft.y;
+        let frameCorner1 = {
+            x: 0,
+            y: 0
+        };
 
-            let frameCorner1 = {
-                x: 0,
-                y: 0
-            };
-
-            let frameCorner2 = {
-                x: thisObject.container.frame.width,
-                y: thisObject.container.frame.height
-            };
+        let frameCorner2 = {
+            x: thisObject.container.frame.width,
+            y: thisObject.container.frame.height
+        };
 
 
-            /* Now the transformations. */
+        /* Now the transformations. */
 
-            frameCorner1 = transformThisPoint(frameCorner1, thisObject.container.frame.container);
-            frameCorner2 = transformThisPoint(frameCorner2, thisObject.container.frame.container);
+        frameCorner1 = transformThisPoint(frameCorner1, thisObject.container.frame.container);
+        frameCorner2 = transformThisPoint(frameCorner2, thisObject.container.frame.container);
 
-            let frameHeightInViewPort = frameCorner2.y - frameCorner1.y;
+        let frameHeightInViewPort = frameCorner2.y - frameCorner1.y;
 
-            if (volumes.length > 0) {
 
-                for (var i = 0; i < volumes.length; i++) {
+        if (stairsArray.length > 0) {
 
-                    volume = volumes[i];
+            for (var i = 0; i < stairsArray.length; i++) {
 
-                    let volumePointA1;
-                    let volumePointA2;
-                    let volumePointA3;
-                    let volumePointA4;
+                stairs = stairsArray[i];
+
+                let volumeBarPointA1;
+                let volumeBarPointA2;
+                let volumeBarPointA3;
+                let volumeBarPointA4;
+
+                if (stairs.type === 'buy') {
 
                     function calculateBuys(plot, height) {
 
-                        volumePointA1 = {
-                            x: volume.begin + timePeriod / 7 * 2,
+                        volumeBarPointA1 = {
+                            x: stairs.begin + timePeriod / 2,
                             y: 0
                         };
 
-                        volumePointA2 = {
-                            x: volume.begin + timePeriod / 7 * 2,
-                            y: volume.amountBuy
+                        volumeBarPointA2 = {
+                            x: stairs.begin + timePeriod / 2,
+                            y: stairs.firstAmount * 2
                         };
 
-                        volumePointA3 = {
-                            x: volume.begin + timePeriod / 7 * 5,
-                            y: volume.amountBuy
+                        volumeBarPointA3 = {
+                            x: stairs.end - timePeriod / 2,
+                            y: stairs.lastAmount * 2
                         };
 
-                        volumePointA4 = {
-                            x: volume.begin + timePeriod / 7 * 5,
+                        volumeBarPointA4 = {
+                            x: stairs.end - timePeriod / 2,
                             y: 0
                         };
 
-                        volumePointA1 = plot.inverseTransform(volumePointA1, height);
-                        volumePointA2 = plot.inverseTransform(volumePointA2, height);
-                        volumePointA3 = plot.inverseTransform(volumePointA3, height);
-                        volumePointA4 = plot.inverseTransform(volumePointA4, height);
 
-                        volumePointA1 = transformThisPoint(volumePointA1, thisObject.container);
-                        volumePointA2 = transformThisPoint(volumePointA2, thisObject.container);
-                        volumePointA3 = transformThisPoint(volumePointA3, thisObject.container);
-                        volumePointA4 = transformThisPoint(volumePointA4, thisObject.container);
+                        volumeBarPointA1 = plot.inverseTransform(volumeBarPointA1, height);
+                        volumeBarPointA2 = plot.inverseTransform(volumeBarPointA2, height);
+                        volumeBarPointA3 = plot.inverseTransform(volumeBarPointA3, height);
+                        volumeBarPointA4 = plot.inverseTransform(volumeBarPointA4, height);
 
-                        let baseIncrement = (volumePointA3.x - volumePointA1.x) * WIDHTER_VOLUME_BAR_BASE_FACTOR;
+                        volumeBarPointA1 = transformThisPoint(volumeBarPointA1, thisObject.container);
+                        volumeBarPointA2 = transformThisPoint(volumeBarPointA2, thisObject.container);
+                        volumeBarPointA3 = transformThisPoint(volumeBarPointA3, thisObject.container);
+                        volumeBarPointA4 = transformThisPoint(volumeBarPointA4, thisObject.container);
 
-                        volumePointA1.x = volumePointA1.x - baseIncrement;
-                        volumePointA4.x = volumePointA4.x + baseIncrement;
 
-                        if (volumePointA4.x < viewPort.visibleArea.bottomLeft.x || volumePointA1.x > viewPort.visibleArea.bottomRight.x) {
+                        if (volumeBarPointA4.x < viewPort.visibleArea.bottomLeft.x || volumeBarPointA1.x > viewPort.visibleArea.bottomRight.x) {
                             return false;
                         }
 
                         return true;
-
                     }
 
                     if (calculateBuys(plotAreaFrame, thisObject.container.frame.height) === false) { continue; } // We try to see if it fits in the visible area.
 
-                    if (volumePointA1.y > viewPort.visibleArea.bottomLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
+                    if (volumeBarPointA1.y > viewPort.visibleArea.bottomLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
 
                         if (calculateBuys(plotArea, visibleHeight) === false) { continue; }  // We snap t to the view port.
 
                         /* Now we set the real value of y. */
 
-                        volumePointA1.y = viewPort.visibleArea.bottomRight.y;
-                        volumePointA2.y = viewPort.visibleArea.bottomRight.y - volume.amountBuy * plotArea.scale.y;
-                        volumePointA3.y = viewPort.visibleArea.bottomRight.y - volume.amountBuy * plotArea.scale.y;
-                        volumePointA4.y = viewPort.visibleArea.bottomRight.y;
+                        volumeBarPointA1.y = viewPort.visibleArea.bottomRight.y;
+                        volumeBarPointA2.y = viewPort.visibleArea.bottomRight.y - stairs.firstAmount * 2 * plotArea.scale.y;
+                        volumeBarPointA3.y = viewPort.visibleArea.bottomRight.y - stairs.lastAmount * 2 * plotArea.scale.y;
+                        volumeBarPointA4.y = viewPort.visibleArea.bottomRight.y;
 
                     }
+                }
 
-                    let volumePointB1;
-                    let volumePointB2;
-                    let volumePointB3;
-                    let volumePointB4;
+                let volumeBarPointB1;
+                let volumeBarPointB2;
+                let volumeBarPointB3;
+                let volumeBarPointB4;
+
+
+                if (stairs.type === 'sell') {
 
                     function calculateSells(plot, height) {
 
-                        volumePointB1 = {
-                            x: volume.begin + timePeriod / 7 * 2,
+                        volumeBarPointB1 = {
+                            x: stairs.begin + timePeriod / 2,
                             y: height
                         };
 
-                        volumePointB2 = {
-                            x: volume.begin + timePeriod / 7 * 2,
-                            y: height - volume.amountSell
+                        volumeBarPointB2 = {
+                            x: stairs.begin + timePeriod / 2,
+                            y: height - stairs.firstAmount * 2
                         };
 
-                        volumePointB3 = {
-                            x: volume.begin + timePeriod / 7 * 5,
-                            y: height - volume.amountSell
+                        volumeBarPointB3 = {
+                            x: stairs.end - timePeriod / 2,
+                            y: height - stairs.lastAmount * 2
                         };
 
-                        volumePointB4 = {
-                            x: volume.begin + timePeriod / 7 * 5,
+                        volumeBarPointB4 = {
+                            x: stairs.end - timePeriod / 2,
                             y: height
                         };
 
-                        volumePointB1 = plot.inverseTransform2(volumePointB1, height);
-                        volumePointB2 = plot.inverseTransform2(volumePointB2, height);
-                        volumePointB3 = plot.inverseTransform2(volumePointB3, height);
-                        volumePointB4 = plot.inverseTransform2(volumePointB4, height);
+                        volumeBarPointB1 = plot.inverseTransform2(volumeBarPointB1, height);
+                        volumeBarPointB2 = plot.inverseTransform2(volumeBarPointB2, height);
+                        volumeBarPointB3 = plot.inverseTransform2(volumeBarPointB3, height);
+                        volumeBarPointB4 = plot.inverseTransform2(volumeBarPointB4, height);
 
-                        volumePointB1 = transformThisPoint(volumePointB1, thisObject.container);
-                        volumePointB2 = transformThisPoint(volumePointB2, thisObject.container);
-                        volumePointB3 = transformThisPoint(volumePointB3, thisObject.container);
-                        volumePointB4 = transformThisPoint(volumePointB4, thisObject.container);
+                        volumeBarPointB1 = transformThisPoint(volumeBarPointB1, thisObject.container);
+                        volumeBarPointB2 = transformThisPoint(volumeBarPointB2, thisObject.container);
+                        volumeBarPointB3 = transformThisPoint(volumeBarPointB3, thisObject.container);
+                        volumeBarPointB4 = transformThisPoint(volumeBarPointB4, thisObject.container);
 
                     }
 
                     calculateSells(plotAreaFrame, thisObject.container.frame.height); // We try to see if it fits in the visible area.
 
-                    if (volumePointB1.y < viewPort.visibleArea.topLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
+                    if (volumeBarPointB1.y < viewPort.visibleArea.topLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
 
                         calculateSells(plotArea, visibleHeight); // We snap it to the view port.
 
                         /* Now we set the real value of y. */
 
-                        volumePointB1.y = viewPort.visibleArea.topLeft.y;
-                        volumePointB2.y = viewPort.visibleArea.topLeft.y + volume.amountSell * plotArea.scale.y;
-                        volumePointB3.y = viewPort.visibleArea.topLeft.y + volume.amountSell * plotArea.scale.y;
-                        volumePointB4.y = viewPort.visibleArea.topLeft.y;
+                        volumeBarPointB1.y = viewPort.visibleArea.topLeft.y;
+                        volumeBarPointB2.y = viewPort.visibleArea.topLeft.y + stairs.firstAmount * 2 * plotArea.scale.y;
+                        volumeBarPointB3.y = viewPort.visibleArea.topLeft.y + stairs.lastAmount * 2 * plotArea.scale.y;
+                        volumeBarPointB4.y = viewPort.visibleArea.topLeft.y;
 
-                    }
-
-                    /* We put a wider base */
-
-                    let baseIncrement = (volumePointB3.x - volumePointB1.x) * WIDHTER_VOLUME_BAR_BASE_FACTOR;
-
-                    volumePointB1.x = volumePointB1.x - baseIncrement;
-                    volumePointB4.x = volumePointB4.x + baseIncrement;
-
-                    /* We put a less wider top */
-
-                    let baseDencrement = (volumePointA3.x - volumePointA2.x) * LESS_WIDHTER_VOLUME_BAR_TOP_FACTOR;
-
-                    volumePointA2.x = volumePointA2.x + baseDencrement;
-                    volumePointA3.x = volumePointA3.x - baseDencrement;
-
-                    volumePointB2.x = volumePointB2.x + baseDencrement;
-                    volumePointB3.x = volumePointB3.x - baseDencrement;
-
-
-                    /* Everything must fit within the visible area */
-
-                    volumePointA1 = viewPort.fitIntoVisibleArea(volumePointA1);
-                    volumePointA2 = viewPort.fitIntoVisibleArea(volumePointA2);
-                    volumePointA3 = viewPort.fitIntoVisibleArea(volumePointA3);
-                    volumePointA4 = viewPort.fitIntoVisibleArea(volumePointA4);
-
-                    volumePointB1 = viewPort.fitIntoVisibleArea(volumePointB1);
-                    volumePointB2 = viewPort.fitIntoVisibleArea(volumePointB2);
-                    volumePointB3 = viewPort.fitIntoVisibleArea(volumePointB3);
-                    volumePointB4 = viewPort.fitIntoVisibleArea(volumePointB4);
-
-                    /* Everything must fit within the Frame. We know that that is equivalent to say that each bar con not be higher than the base of the opposite . */
-
-                    if (volumePointA2.y < volumePointB1.y) {
-
-                        volumePointA2.y = volumePointB1.y;
-                        volumePointA3.y = volumePointB1.y;
-
-                    }
-
-                    if (volumePointB2.y > volumePointA1.y) {
-
-                        volumePointB2.y = volumePointA1.y;
-                        volumePointB3.y = volumePointA1.y;
-
-                    }
-
-                    /* Now the drawing of the volume bars*/
-
-                    browserCanvasContext.beginPath();
-
-                    browserCanvasContext.moveTo(volumePointA1.x, volumePointA1.y);
-                    browserCanvasContext.lineTo(volumePointA2.x, volumePointA2.y);
-                    browserCanvasContext.lineTo(volumePointA3.x, volumePointA3.y);
-                    browserCanvasContext.lineTo(volumePointA4.x, volumePointA4.y);
-
-                    browserCanvasContext.closePath();
-
-
-                    if (datetime !== undefined) {
-
-                        let dateValue = datetime.valueOf();
-
-                        if (dateValue >= volume.begin && dateValue <= volume.end) {
-
-                            browserCanvasContext.fillStyle = 'rgba(255, 233, 31, 0.40)'; // Current bar accroding to time
-
-                        } else {
-
-                            browserCanvasContext.fillStyle = 'rgba(64, 217, 26, 0.40)';
-                        }
-
-                    } else {
-
-                        browserCanvasContext.fillStyle = 'rgba(64, 217, 26, 0.40)';
-
-                    }
-
-                    browserCanvasContext.fill();
-                    browserCanvasContext.strokeStyle = 'rgba(27, 105, 7, 0.40)';
-                    browserCanvasContext.lineWidth = 1;
-                    browserCanvasContext.stroke();
-
-
-                    browserCanvasContext.beginPath();
-
-                    browserCanvasContext.moveTo(volumePointB1.x, volumePointB1.y);
-                    browserCanvasContext.lineTo(volumePointB2.x, volumePointB2.y);
-                    browserCanvasContext.lineTo(volumePointB3.x, volumePointB3.y);
-                    browserCanvasContext.lineTo(volumePointB4.x, volumePointB4.y);
-
-                    browserCanvasContext.closePath();
-
-                    if (datetime !== undefined) {
-
-                        let dateValue = datetime.valueOf();
-
-                        if (dateValue >= volume.begin && dateValue <= volume.end) {
-
-                            browserCanvasContext.fillStyle = 'rgba(255, 233, 31, 0.40)'; // Current candle accroding to time
-
-                        } else {
-
-                            browserCanvasContext.fillStyle = 'rgba(219, 18, 18, 0.40)';
-                        }
-
-                    } else {
-
-                        browserCanvasContext.fillStyle = 'rgba(219, 18, 18, 0.40)';
-
-                    }
-
-                    browserCanvasContext.strokeStyle = 'rgba(130, 9, 9, 0.40)';
-
-                    browserCanvasContext.fill();
-                    browserCanvasContext.lineWidth = 1;
-                    browserCanvasContext.stroke();
-
-
-
-                    if (datetime !== undefined) {
-
-                        let dateValue = datetime.valueOf();
-
-                        if (dateValue >= volume.begin && dateValue <= volume.end) {
-
-                            let buyInfo = {
-                                baseWidth: volumePointA4.x - volumePointA1.x,
-                                topWidth: volumePointA3.x - volumePointA2.x,
-                                height: volumePointA2.y - volumePointA1.y
-                            };
-
-                            let sellInfo = {
-                                baseWidth: volumePointB4.x - volumePointB1.x,
-                                topWidth: volumePointB3.x - volumePointB2.x,
-                                height: volumePointB2.y - volumePointB1.y
-                            };
-
-                            let currentVolume = {
-                                buyInfo: buyInfo,
-                                sellInfo: sellInfo,
-                                period: timePeriod,
-                                innerVolumeBar: volume
-                            };
-
-                            thisObject.container.eventHandler.raiseEvent("Current Volume Info Changed", currentVolume);
-
-                        }
                     }
                 }
+
+
+                /* Everything must fit within the visible area */
+
+                if (stairs.type === 'buy') {
+
+                    volumeBarPointA1 = viewPort.fitIntoVisibleArea(volumeBarPointA1);
+                    volumeBarPointA2 = viewPort.fitIntoVisibleArea(volumeBarPointA2);
+                    volumeBarPointA3 = viewPort.fitIntoVisibleArea(volumeBarPointA3);
+                    volumeBarPointA4 = viewPort.fitIntoVisibleArea(volumeBarPointA4);
+
+                } else {
+
+                    volumeBarPointB1 = viewPort.fitIntoVisibleArea(volumeBarPointB1);
+                    volumeBarPointB2 = viewPort.fitIntoVisibleArea(volumeBarPointB2);
+                    volumeBarPointB3 = viewPort.fitIntoVisibleArea(volumeBarPointB3);
+                    volumeBarPointB4 = viewPort.fitIntoVisibleArea(volumeBarPointB4);
+
+                }
+
+
+
+                /* Now the drawing */
+
+                if (stairs.type === 'buy') {
+
+                    browserCanvasContext.beginPath();
+
+                    browserCanvasContext.moveTo(volumeBarPointA1.x, volumeBarPointA1.y);
+                    browserCanvasContext.lineTo(volumeBarPointA2.x, volumeBarPointA2.y);
+                    browserCanvasContext.lineTo(volumeBarPointA3.x, volumeBarPointA3.y);
+                    browserCanvasContext.lineTo(volumeBarPointA4.x, volumeBarPointA4.y);
+
+                    browserCanvasContext.closePath();
+
+
+                    if (datetime !== undefined) {
+
+                        let dateValue = datetime.valueOf();
+
+                        if (dateValue >= stairs.begin && dateValue <= stairs.end) {
+
+                            browserCanvasContext.fillStyle = 'rgba(255, 233, 31, ' + opacity + ')'; // Current bar accroding to time
+
+                        } else {
+
+                            browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')';
+                        }
+
+                    } else {
+
+                        browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')';
+
+                    }
+
+                    browserCanvasContext.fill();
+                    browserCanvasContext.strokeStyle = 'rgba(27, 105, 7, ' + opacity + ')';
+                    browserCanvasContext.lineWidth = 1;
+                    browserCanvasContext.stroke();
+
+                } else {
+
+                    browserCanvasContext.beginPath();
+
+                    browserCanvasContext.moveTo(volumeBarPointB1.x, volumeBarPointB1.y);
+                    browserCanvasContext.lineTo(volumeBarPointB2.x, volumeBarPointB2.y);
+                    browserCanvasContext.lineTo(volumeBarPointB3.x, volumeBarPointB3.y);
+                    browserCanvasContext.lineTo(volumeBarPointB4.x, volumeBarPointB4.y);
+
+                    browserCanvasContext.closePath();
+
+                    if (datetime !== undefined) {
+
+                        let dateValue = datetime.valueOf();
+
+                        if (dateValue >= stairs.begin && dateValue <= stairs.end) {
+
+                            browserCanvasContext.fillStyle = 'rgba(255, 233, 31, ' + opacity + ')'; // Current candle accroding to time
+
+                        } else {
+
+                            browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')';
+                        }
+
+                    } else {
+
+                        browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')';
+
+                    }
+
+                    browserCanvasContext.strokeStyle = 'rgba(130, 9, 9, ' + opacity + ')';
+
+                    browserCanvasContext.fill();
+                    browserCanvasContext.lineWidth = 1;
+                    browserCanvasContext.stroke();
+
+
+                }
+
+
+
+
             }
+
         }
     }
 
     function onLayerStatusChanged(eventData) {
 
-        if (eventData.layer === 'Olivia Volumes') {
+        if (eventData.layer === 'Tom Volume-Stairs') {
             layerStatus = eventData.status;
         }
 
