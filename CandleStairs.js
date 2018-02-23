@@ -103,7 +103,6 @@
                         layerStatus = pLayerStatus;
 
                         recalculate();
-==
 
                         viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
                         canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
