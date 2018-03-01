@@ -48,7 +48,7 @@
         timePeriod = pTimePeriod;
 
         fileCache = newFileCache();
-        fileCache.initialize("AAMasters", "AATom", "Market Candle-Stairs", "Market Candle-Stairs", pExchange, pMarket, onFileReady);
+        fileCache.initialize("AAMasters", "AATom", "Candle-Stairs", "Market Files", pExchange, pMarket, onFileReady);
 
         function onFileReady() {
 
@@ -70,7 +70,7 @@
                 cursorCacheInProgress = true;
 
                 fileCursorCache = newFileCursorCache();
-                fileCursorCache.initialize("AAMasters", "AATom", "Daily Candle-Stairs", "Daily Candle-Stairs", pExchange, pMarket, pDatetime, pTimePeriod, onFileCursorReady);
+                fileCursorCache.initialize("AAMasters", "AATom", "Candle-Stairs", "Daily Files", pExchange, pMarket, pDatetime, pTimePeriod, onFileCursorReady);
 
             }
         }
