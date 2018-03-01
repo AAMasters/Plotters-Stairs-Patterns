@@ -1,4 +1,4 @@
-﻿function newAAMastersAATomCandleStairs() {
+﻿function newAAMastersPlottersStairsPatternsCandleStairs() {
 
     let thisObject = {
 

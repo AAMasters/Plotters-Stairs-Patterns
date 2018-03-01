@@ -1,4 +1,4 @@
-﻿function newAAMastersAATomVolumeStairs() {
+﻿function newAAMastersPlottersStairsPatternsVolumeStairs() {
 
     let thisObject = {
 
