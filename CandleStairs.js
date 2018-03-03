@@ -22,7 +22,7 @@
     container.initialize();
     thisObject.container = container;
 
-    let plotArea = newTimeLineCoordinateSystem();       // Needed to be able to plot on the timeline, otherwise not.
+    let timeLineCoordinateSystem = newTimeLineCoordinateSystem();       // Needed to be able to plot on the timeline, otherwise not.
 
     let timePeriod;                     // This will hold the current Time Period the user is at.
     let datetime;                       // This will hold the current Datetime the user is at.
@@ -194,8 +194,8 @@
 
         let daysOnSides = getSideDays(timePeriod);
 
-        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, plotArea);
-        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, plotArea);
+        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
+        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
 
         let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
@@ -290,8 +290,8 @@
 
         let daysOnSides = getSideDays(timePeriod);
 
-        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, plotArea);
-        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, plotArea);
+        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
+        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
 
         let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
@@ -353,7 +353,7 @@
 
         if (marketFile === undefined) { return; } // We need the market file to be loaded to make the calculation.
 
-        if (plotArea.maxValue > 0) { return; } // Already calculated.
+        if (timeLineCoordinateSystem.maxValue > 0) { return; } // Already calculated.
 
         let minValue = {
             x: EARLIEST_DATE.valueOf(),
@@ -366,7 +366,7 @@
         };
 
 
-        plotArea.initialize(
+        timeLineCoordinateSystem.initialize(
             minValue,
             maxValue,
             thisObject.container.frame.width,
@@ -450,10 +450,10 @@
                     };
                 }
 
-                stairsPoint1 = plotArea.inverseTransform(stairsPoint1, thisObject.container.frame.height);
-                stairsPoint2 = plotArea.inverseTransform(stairsPoint2, thisObject.container.frame.height);
-                stairsPoint3 = plotArea.inverseTransform(stairsPoint3, thisObject.container.frame.height);
-                stairsPoint4 = plotArea.inverseTransform(stairsPoint4, thisObject.container.frame.height);
+                stairsPoint1 = timeLineCoordinateSystem.transformThisPoint(stairsPoint1);
+                stairsPoint2 = timeLineCoordinateSystem.transformThisPoint(stairsPoint2);
+                stairsPoint3 = timeLineCoordinateSystem.transformThisPoint(stairsPoint3);
+                stairsPoint4 = timeLineCoordinateSystem.transformThisPoint(stairsPoint4);
 
                 stairsPoint1 = transformThisPoint(stairsPoint1, thisObject.container);
                 stairsPoint2 = transformThisPoint(stairsPoint2, thisObject.container);
