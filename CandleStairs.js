@@ -133,13 +133,8 @@
 
     function onDailyFileLoaded(event) {
 
-        if (event.currentValue === event.totalValue) {
+        recalculate();
 
-            /* This happens only when all of the files in the cursor have been loaded. */
-
-            recalculate()
-
-        }
     }
 
     function draw() {
