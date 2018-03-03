@@ -18,8 +18,8 @@
     container.initialize();
     thisObject.container = container;
 
-    let plotArea = newPlotArea();       // Needed to be able to plot on the timeline, otherwise not.
-    let plotAreaFrame = newPlotArea();  // This chart uses this extra object.
+    let plotArea = newTimeLineCoordinateSystem();       // Needed to be able to plot on the timeline, otherwise not.
+    let plotAreaFrame = newTimeLineCoordinateSystem();  // This chart uses this extra object.
 
     let timePeriod;                     // This will hold the current Time Period the user is at.
     let datetime;                       // This will hold the current Datetime the user is at.
@@ -52,10 +52,6 @@
 
         scaleFile = fileCache.getFile(ONE_DAY_IN_MILISECONDS);  // This file is the one processed faster. 
 
-        recalculateScaleX();
-        recalculate();
-        recalculateScaleY();
-
         /* Now we set the right files according to current Period. */
 
         marketFile = fileCache.getFile(pTimePeriod); 
@@ -65,6 +61,12 @@
 
         viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
         canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
+
+        /* Get ready for plotting. */
+
+        recalculateScaleX();
+        recalculate();
+        recalculateScaleY();
 
         callBackFunction();
 
