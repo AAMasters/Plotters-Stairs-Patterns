@@ -1,0 +1,3 @@
+C:\Users\Luis\source\repos\Plotters\AAMasters\Plotters-Stairs-Patterns\obj\Debug\Project.njsprojResolveAssemblyReference.cache
+C:\Users\Luis\source\repos\Plotters\AAMasters\Plotters-Stairs-Patterns\obj\Debug\Project.njsproj.CoreCompileInputs.cache
+C:\Users\Luis\source\repos\Plotters\AAMasters\Plotters-Stairs-Patterns\bin\Microsoft.NodejsTools.WebRole.dll
