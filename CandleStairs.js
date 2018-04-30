@@ -35,7 +35,7 @@
     let fileCursor;                     // This is the current File Cursor being used to retrieve Daily Files.
 
     let marketFiles;                      // This object will provide the different Market Files at different Time Periods.
-    let fileCursorCache;                // This object will provide the different File Cursors at different Time Periods.
+    let dailyFiles;                // This object will provide the different File Cursors at different Time Periods.
 
     /* these are module specific variables: */
 
@@ -48,7 +48,7 @@
         /* Store the information received. */
 
         marketFiles = pStorage.marketFiles[0];
-        fileCursorCache = pStorage.fileCursorCache[0];
+        dailyFiles = pStorage.dailyFiles[0];
 
         datetime = pDatetime;
         timePeriod = pTimePeriod;
@@ -62,7 +62,7 @@
         /* Now we set the right files according to current Period. */
 
         marketFile = marketFiles.getFile(pTimePeriod);
-        fileCursor = fileCursorCache.getFileCursor(pTimePeriod);
+        fileCursor = dailyFiles.getFileCursor(pTimePeriod);
 
         /* Listen to the necesary events. */
 
@@ -114,7 +114,7 @@
 
             } else {
 
-                let newFileCursor = fileCursorCache.getFileCursor(pTimePeriod);
+                let newFileCursor = dailyFiles.getFileCursor(pTimePeriod);
 
                 if (newFileCursor !== undefined) {
 
