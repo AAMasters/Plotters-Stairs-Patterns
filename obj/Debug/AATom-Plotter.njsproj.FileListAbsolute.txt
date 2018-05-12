@@ -1,3 +1,0 @@
-C:\Users\Luis\source\repos\AATom-Plotter\obj\Debug\AATom-Plotter.njsprojResolveAssemblyReference.cache
-C:\Users\Luis\source\repos\AATom-Plotter\obj\Debug\AATom-Plotter.njsproj.CoreCompileInputs.cache
-C:\Users\Luis\source\repos\AATom-Plotter\bin\Microsoft.NodejsTools.WebRole.dll
