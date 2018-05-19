@@ -68,6 +68,7 @@
 
         viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
         canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
+        viewPort.eventHandler.listenToEvent("Offset Changed", onOffsetChanged);
 
         /* Get ready for plotting. */
 
@@ -503,6 +504,15 @@
     function onDragFinished() {
 
         recalculate();
+
+    }
+
+    function onOffsetChanged() {
+
+        if (Math.random() * 100 > 95) {
+
+            recalculate()
+        };
 
     }
 }
