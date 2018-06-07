@@ -570,21 +570,21 @@
 
                         if (dateValue >= stairs.begin && dateValue <= stairs.end) {
 
-                            browserCanvasContext.fillStyle = 'rgba(255, 233, 31, ' + opacity + ')'; // Current bar accroding to time
+                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current bar accroding to time
 
                         } else {
 
-                            browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')';
+                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
                         }
 
                     } else {
 
-                        browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')';
+                        browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
 
                     }
 
                     browserCanvasContext.fill();
-                    browserCanvasContext.strokeStyle = 'rgba(27, 105, 7, ' + opacity + ')';
+                    browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.PATINATED_TURQUOISE + ', ' + opacity + ')';
                     browserCanvasContext.lineWidth = 1;
                     browserCanvasContext.stroke();
 
@@ -605,20 +605,20 @@
 
                         if (dateValue >= stairs.begin && dateValue <= stairs.end) {
 
-                            browserCanvasContext.fillStyle = 'rgba(255, 233, 31, ' + opacity + ')'; // Current candle accroding to time
+                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current candle accroding to time
 
                         } else {
 
-                            browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')';
+                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')';
                         }
 
                     } else {
 
-                        browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')';
+                        browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')';
 
                     }
 
-                    browserCanvasContext.strokeStyle = 'rgba(130, 9, 9, ' + opacity + ')';
+                    browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.RED + ', ' + opacity + ')';
 
                     browserCanvasContext.fill();
                     browserCanvasContext.lineWidth = 1;

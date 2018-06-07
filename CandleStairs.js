@@ -460,8 +460,8 @@
 
                 let opacity = '0.25';
 
-                if (stairs.direction === 'up') { browserCanvasContext.strokeStyle = 'rgba(27, 105, 7, ' + opacity + ')'; }
-                if (stairs.direction === 'down') { browserCanvasContext.strokeStyle = 'rgba(130, 9, 9, ' + opacity + ')'; }
+                if (stairs.direction === 'up') { browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.PATINATED_TURQUOISE + ', ' + opacity + ')'; }
+                if (stairs.direction === 'down') { browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.RED + ', ' + opacity + ')'; }
 
                 if (datetime !== undefined) {
 
@@ -472,18 +472,18 @@
 
                         /* highlight the current stairs */
 
-                        browserCanvasContext.fillStyle = 'rgba(255, 233, 31, 0.1)'; // Current stairs accroding to time
+                        browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', 0.1)'; // Current stairs accroding to time
 
                     } else {
 
-                        if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')'; }
-                        if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')'; }
+                        if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')'; }
+                        if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')'; }
                     }
 
                 } else {
 
-                    if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(64, 217, 26, ' + opacity + ')'; }
-                    if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(219, 18, 18, ' + opacity + ')'; }
+                    if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')'; }
+                    if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')'; }
                 }
 
                 browserCanvasContext.fill();
