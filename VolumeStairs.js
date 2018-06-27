@@ -1,5 +1,12 @@
 ﻿function newAAMastersPlottersStairsPatternsVolumeStairs() {
 
+    const MODULE_NAME = "AAMasters Plotters Stairs Patterns Volume Stairs";
+    const INFO_LOG = false;
+    const ERROR_LOG = true;
+    const INTENSIVE_LOG = false;
+    const logger = newWebDebugLog();
+    logger.fileName = MODULE_NAME;
+
     let thisObject = {
 
         /* Events declared outside the plotter. */
@@ -44,88 +51,119 @@
 
     function initialize(pStorage, pExchange, pMarket, pDatetime, pTimePeriod, callBackFunction) {
 
-        /* Store the information received. */
+        try {
 
-        marketFiles = pStorage.marketFiles[0];
-        dailyFiles = pStorage.dailyFiles[0];
+            if (INFO_LOG === true) { logger.write("[INFO] initialize -> Entering function."); }
 
-        datetime = pDatetime;
-        timePeriod = pTimePeriod;
+            /* Store the information received. */
 
-        /* We need a Market File in order to calculate the Y scale, since this scale depends on actual data. */
+            marketFiles = pStorage.marketFiles[0];
+            dailyFiles = pStorage.dailyFiles[0];
 
-        scaleFile = marketFiles.getFile(ONE_DAY_IN_MILISECONDS);  // This file is the one processed faster. 
+            datetime = pDatetime;
+            timePeriod = pTimePeriod;
 
-        /* Now we set the right files according to current Period. */
+            /* We need a Market File in order to calculate the Y scale, since this scale depends on actual data. */
 
-        marketFile = marketFiles.getFile(pTimePeriod); 
-        fileCursor = dailyFiles.getFileCursor(pTimePeriod);
+            scaleFile = marketFiles.getFile(ONE_DAY_IN_MILISECONDS);  // This file is the one processed faster. 
 
-        /* Listen to the necesary events. */
+            /* Now we set the right files according to current Period. */
 
-        viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
-        canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
-        viewPort.eventHandler.listenToEvent("Offset Changed", onOffsetChanged);
+            marketFile = marketFiles.getFile(pTimePeriod);
+            fileCursor = dailyFiles.getFileCursor(pTimePeriod);
 
-        /* Get ready for plotting. */
+            /* Listen to the necesary events. */
 
-        recalculateScaleX();
-        recalculate();
-        recalculateScaleY();
+            viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
+            canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
+            viewPort.eventHandler.listenToEvent("Offset Changed", onOffsetChanged);
 
-        callBackFunction();
+            /* Get ready for plotting. */
 
+            recalculateScaleX();
+            recalculate();
+            recalculateScaleY();
+
+            callBackFunction();
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] initialize -> err = " + err); }
+            callBackFunction(GLOBAL.DEFAULT_FAIL_RESPONSE);
+
+        }
     }
 
     function getContainer(point) {
 
-        let container;
+        try {
 
-        /* First we check if this point is inside this space. */
+            if (INFO_LOG === true) { logger.write("[INFO] getContainer -> Entering function."); }
 
-        if (this.container.frame.isThisPointHere(point) === true) {
+            let container;
 
-            return this.container;
+            /* First we check if this point is inside this space. */
 
-        } else {
+            if (this.container.frame.isThisPointHere(point) === true) {
 
-            /* This point does not belong to this space. */
+                return this.container;
 
-            return undefined;
+            } else {
+
+                /* This point does not belong to this space. */
+
+                return undefined;
+            }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] getContainer -> err = " + err); }
+
         }
-
     }
 
     function setTimePeriod(pTimePeriod) {
 
-        if (timePeriod !== pTimePeriod) {
+        try {
 
-            timePeriod = pTimePeriod;
+            if (INFO_LOG === true) { logger.write("[INFO] setTimePeriod -> Entering function."); }
 
-            if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
+            if (timePeriod !== pTimePeriod) {
 
-                let newMarketFile = marketFiles.getFile(pTimePeriod);
+                timePeriod = pTimePeriod;
 
-                if (newMarketFile !== undefined) {
+                if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
 
-                    marketFile = newMarketFile;
-                    recalculate();
-                }
+                    let newMarketFile = marketFiles.getFile(pTimePeriod);
 
-            } else {
+                    if (newMarketFile !== undefined) {
 
-                let newFileCursor = dailyFiles.getFileCursor(pTimePeriod);
+                        marketFile = newMarketFile;
+                        recalculate();
+                    }
 
-                if (newFileCursor !== undefined) {
+                } else {
 
-                    fileCursor = newFileCursor;
-                    recalculate();
+                    let newFileCursor = dailyFiles.getFileCursor(pTimePeriod);
+
+                    if (newFileCursor !== undefined) {
+
+                        fileCursor = newFileCursor;
+                        recalculate();
+                    }
                 }
             }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] setTimePeriod -> err = " + err); }
+
         }
     }
 
     function setDatetime(pDatetime) {
+
+        if (INFO_LOG === true) { logger.write("[INFO] setDatetime -> Entering function."); }
 
         datetime = pDatetime;
 
@@ -133,533 +171,635 @@
 
     function onDailyFileLoaded(event) {
 
-        if (event.currentValue === event.totalValue) {
+        try {
 
-            /* This happens only when all of the files in the cursor have been loaded. */
+            if (INFO_LOG === true) { logger.write("[INFO] onDailyFileLoaded -> Entering function."); }
 
-            recalculateScaleX();
-            recalculate();
-            recalculateScaleY();
+            if (event.currentValue === event.totalValue) {
+
+                /* This happens only when all of the files in the cursor have been loaded. */
+
+                recalculateScaleX();
+                recalculate();
+                recalculateScaleY();
+
+            }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onDailyFileLoaded -> err = " + err); }
 
         }
     }
 
     function draw() {
 
-        this.container.frame.draw();
+        try {
 
-        plotChart();
+            if (INTENSIVE_LOG === true) { logger.write("[INFO] draw -> Entering function."); }
 
+            this.container.frame.draw();
+
+            plotChart();
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] draw -> err = " + err); }
+
+        }
     }
 
     function recalculate() {
 
-        if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
+        try {
 
-            recalculateUsingMarketFiles();
+            if (INFO_LOG === true) { logger.write("[INFO] recalculate -> Entering function."); }
 
-        } else {
+            if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
 
-            recalculateUsingDailyFiles();
+                recalculateUsingMarketFiles();
+
+            } else {
+
+                recalculateUsingDailyFiles();
+
+            }
+
+            thisObject.container.eventHandler.raiseEvent("Volumes Changed", stairsArray);
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculate -> err = " + err); }
 
         }
-
-        thisObject.container.eventHandler.raiseEvent("Volumes Changed", stairsArray);
     }
 
     function recalculateUsingDailyFiles() {
 
-        if (fileCursor === undefined) { return; } // We need to wait
+        try {
 
-        if (fileCursor.files.size === 0) { return; } // We need to wait until there are files in the cursor
+            if (INFO_LOG === true) { logger.write("[INFO] recalculateUsingDailyFiles -> Entering function."); }
 
-        let daysOnSides = getSideDays(timePeriod);
+            if (fileCursor === undefined) { return; } // We need to wait
 
-        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
-        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
+            if (fileCursor.files.size === 0) { return; } // We need to wait until there are files in the cursor
 
-        let dateDiff = rightDate.valueOf() - leftDate.valueOf();
+            let daysOnSides = getSideDays(timePeriod);
 
-        let farLeftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
-        let farRightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
+            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
+            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
 
-        let currentDate = new Date(farLeftDate.valueOf());
+            let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
-        stairsArray = [];
+            let farLeftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
+            let farRightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
 
-        while (currentDate.valueOf() <= farRightDate.valueOf() + ONE_DAY_IN_MILISECONDS) {
+            let currentDate = new Date(farLeftDate.valueOf());
 
-            let stringDate = currentDate.getFullYear() + '-' + pad(currentDate.getMonth() + 1, 2) + '-' + pad(currentDate.getDate(), 2);
+            stairsArray = [];
 
-            let dailyFile = fileCursor.files.get(stringDate);
+            while (currentDate.valueOf() <= farRightDate.valueOf() + ONE_DAY_IN_MILISECONDS) {
 
-            if (dailyFile !== undefined) {
+                let stringDate = currentDate.getFullYear() + '-' + pad(currentDate.getMonth() + 1, 2) + '-' + pad(currentDate.getDate(), 2);
 
-                for (let i = 0; i < dailyFile.length; i++) {
+                let dailyFile = fileCursor.files.get(stringDate);
 
-                    let stairs = {
-                        type: undefined,
-                        begin: undefined,
-                        end: undefined,
-                        direction: undefined,
-                        barsCount: 0,
-                        firstAmount: 0,
-                        lastAmount: 0
-                    };
+                if (dailyFile !== undefined) {
 
-                    stairs.type = dailyFile[i][0];
+                    for (let i = 0; i < dailyFile.length; i++) {
 
-                    stairs.begin = dailyFile[i][1];
-                    stairs.end = dailyFile[i][2];
+                        let stairs = {
+                            type: undefined,
+                            begin: undefined,
+                            end: undefined,
+                            direction: undefined,
+                            barsCount: 0,
+                            firstAmount: 0,
+                            lastAmount: 0
+                        };
 
-                    stairs.direction = dailyFile[i][3];
-                    stairs.barsCount = dailyFile[i][4];
-                    stairs.firstAmount = dailyFile[i][5];
-                    stairs.lastAmount = dailyFile[i][6];
+                        stairs.type = dailyFile[i][0];
 
-                    if (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) {
+                        stairs.begin = dailyFile[i][1];
+                        stairs.end = dailyFile[i][2];
 
-                        stairsArray.push(stairs);
+                        stairs.direction = dailyFile[i][3];
+                        stairs.barsCount = dailyFile[i][4];
+                        stairs.firstAmount = dailyFile[i][5];
+                        stairs.lastAmount = dailyFile[i][6];
 
-                        if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+                        if (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) {
 
-                            thisObject.container.eventHandler.raiseEvent("Current Candle Changed", thisObject.currentCandle);
+                            stairsArray.push(stairs);
 
+                            if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+
+                                thisObject.container.eventHandler.raiseEvent("Current Candle Changed", thisObject.currentCandle);
+
+                            }
                         }
                     }
                 }
+
+                currentDate = new Date(currentDate.valueOf() + ONE_DAY_IN_MILISECONDS);
             }
 
-            currentDate = new Date(currentDate.valueOf() + ONE_DAY_IN_MILISECONDS);
-        }
+            /* Lests check if all the visible screen is going to be covered by stairsArray. */
 
-        /* Lests check if all the visible screen is going to be covered by stairsArray. */
+            let lowerEnd = leftDate.valueOf();
+            let upperEnd = rightDate.valueOf();
 
-        let lowerEnd = leftDate.valueOf();
-        let upperEnd = rightDate.valueOf();
+            if (stairsArray.length > 0) {
 
-        if (stairsArray.length > 0) {
+                if (stairsArray[0].begin > lowerEnd || stairsArray[stairsArray.length - 1].end < upperEnd) {
 
-            if (stairsArray[0].begin > lowerEnd || stairsArray[stairsArray.length - 1].end < upperEnd) {
+                    setTimeout(recalculate, 2000);
 
-                setTimeout(recalculate, 2000);
+                    //console.log("File missing while calculating stairsArray, scheduling a recalculation in 2 seconds.");
 
-                //console.log("File missing while calculating stairsArray, scheduling a recalculation in 2 seconds.");
-
+                }
             }
+
+            //console.log("Olivia > recalculateUsingDailyFiles > total stairsArray generated : " + stairsArray.length);
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingDailyFiles -> err = " + err); }
+
         }
-
-        //console.log("Olivia > recalculateUsingDailyFiles > total stairsArray generated : " + stairsArray.length);
-
     }
 
     function recalculateUsingMarketFiles() {
 
-        if (marketFile === undefined) { return; } // Initialization not complete yet.
+        try {
 
-        let daysOnSides = getSideDays(timePeriod);
+            if (INFO_LOG === true) { logger.write("[INFO] recalculateUsingMarketFiles -> Entering function."); }
 
-        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
-        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
+            if (marketFile === undefined) { return; } // Initialization not complete yet.
 
-        let dateDiff = rightDate.valueOf() - leftDate.valueOf();
+            let daysOnSides = getSideDays(timePeriod);
 
-        leftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
-        rightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
+            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
+            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
 
-        stairsArray = [];
+            let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
-        for (let i = 0; i < marketFile.length; i++) {
+            leftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
+            rightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
 
-            let stairs = {
-                type: undefined,
-                begin: undefined,
-                end: undefined,
-                direction: undefined,
-                barsCount: 0,
-                firstAmount: 0,
-                lastAmount: 0
-            };
+            stairsArray = [];
 
-            stairs.type = marketFile[i][0];
+            for (let i = 0; i < marketFile.length; i++) {
 
-            stairs.begin = marketFile[i][1];
-            stairs.end = marketFile[i][2];
+                let stairs = {
+                    type: undefined,
+                    begin: undefined,
+                    end: undefined,
+                    direction: undefined,
+                    barsCount: 0,
+                    firstAmount: 0,
+                    lastAmount: 0
+                };
 
-            stairs.direction = marketFile[i][3];
-            stairs.barsCount = marketFile[i][4];
-            stairs.firstAmount = marketFile[i][5];
-            stairs.lastAmount = marketFile[i][6];
+                stairs.type = marketFile[i][0];
 
-            if (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) {
+                stairs.begin = marketFile[i][1];
+                stairs.end = marketFile[i][2];
 
-                stairsArray.push(stairs);
+                stairs.direction = marketFile[i][3];
+                stairs.barsCount = marketFile[i][4];
+                stairs.firstAmount = marketFile[i][5];
+                stairs.lastAmount = marketFile[i][6];
 
-                if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+                if (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) {
 
-                    thisObject.container.eventHandler.raiseEvent("Current Volume-Stairs Changed", thisObject.currentCandle);
+                    stairsArray.push(stairs);
 
+                    if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+
+                        thisObject.container.eventHandler.raiseEvent("Current Volume-Stairs Changed", thisObject.currentCandle);
+
+                    }
                 }
             }
-        }
 
-        //console.log("Olivia > recalculateUsingMarketFiles > total stairsArray generated : " + stairsArray.length);
+            //console.log("Olivia > recalculateUsingMarketFiles > total stairsArray generated : " + stairsArray.length);
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingMarketFiles -> err = " + err); }
+
+        }
     }
 
     function recalculateScaleX() {
 
+        try {
 
-        var minValue = {
-            x: EARLIEST_DATE.valueOf()
-        };
+            if (INFO_LOG === true) { logger.write("[INFO] recalculateScaleX -> Entering function."); }
 
-        var maxValue = {
-            x: MAX_PLOTABLE_DATE.valueOf()
-        };
+            var minValue = {
+                x: EARLIEST_DATE.valueOf()
+            };
 
-        timeLineCoordinateSystem.initializeX(
-            minValue,
-            maxValue,
-            thisObject.container.frame.width
-        );
+            var maxValue = {
+                x: MAX_PLOTABLE_DATE.valueOf()
+            };
 
-        timeLineCoordinateSystemFrame.initializeX(
-            minValue,
-            maxValue,
-            thisObject.container.frame.width
-        );
+            timeLineCoordinateSystem.initializeX(
+                minValue,
+                maxValue,
+                thisObject.container.frame.width
+            );
 
+            timeLineCoordinateSystemFrame.initializeX(
+                minValue,
+                maxValue,
+                thisObject.container.frame.width
+            );
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleX -> err = " + err); }
+
+        }
     }
 
     function recalculateScaleY() {
 
-        var minValue = {
-            y: 0
-        };
+        try {
 
-        var maxValue = {
-            y: 0
-        };
+            if (INFO_LOG === true) { logger.write("[INFO] recalculateScaleY -> Entering function."); }
 
-        let timePeriodRatio = ONE_DAY_IN_MILISECONDS / timePeriod;
+            var minValue = {
+                y: 0
+            };
 
-        maxValue.y = getMaxVolume() / (timePeriodRatio / 2.5);
+            var maxValue = {
+                y: 0
+            };
 
-        timeLineCoordinateSystem.initializeY(
-            minValue,
-            maxValue,
-            viewPort.visibleArea.bottomRight.y - viewPort.visibleArea.topLeft.y
-        );
+            let timePeriodRatio = ONE_DAY_IN_MILISECONDS / timePeriod;
 
-        timeLineCoordinateSystemFrame.initializeY(
-            minValue,
-            maxValue,
-            thisObject.container.frame.height
-        );
+            maxValue.y = getMaxVolume() / (timePeriodRatio / 2.5);
 
-        function getMaxVolume() {
+            timeLineCoordinateSystem.initializeY(
+                minValue,
+                maxValue,
+                viewPort.visibleArea.bottomRight.y - viewPort.visibleArea.topLeft.y
+            );
 
-            let maxValue = 0;
+            timeLineCoordinateSystemFrame.initializeY(
+                minValue,
+                maxValue,
+                thisObject.container.frame.height
+            );
 
-            for (var i = 0; i < scaleFile.length; i++) {
+            function getMaxVolume() {
 
-                let currentMax = (scaleFile[i][5] + scaleFile[i][6]) * 8;
+                try {
 
-                if (maxValue < currentMax) {
-                    maxValue = currentMax;
+                    if (INFO_LOG === true) { logger.write("[INFO] recalculateScaleY -> getMaxVolume -> Entering function."); }
+
+                    let maxValue = 0;
+
+                    for (var i = 0; i < scaleFile.length; i++) {
+
+                        let currentMax = (scaleFile[i][5] + scaleFile[i][6]) * 8;
+
+                        if (maxValue < currentMax) {
+                            maxValue = currentMax;
+                        }
+                    }
+
+                    return maxValue;
+
+                } catch (err) {
+
+                    if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleY -> getMaxVolume -> err = " + err); }
+
                 }
             }
 
-            return maxValue;
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleY -> err = " + err); }
 
         }
-
     }
 
     function plotChart() {
 
-        let opacity = '0.25';
+        try {
 
-        let visibleHeight = viewPort.visibleArea.bottomRight.y - viewPort.visibleArea.topLeft.y;
+            if (INTENSIVE_LOG === true) { logger.write("[INFO] plotChart -> Entering function."); }
 
-        let frameCorner1 = {
-            x: 0,
-            y: 0
-        };
+            let opacity = '0.25';
 
-        let frameCorner2 = {
-            x: thisObject.container.frame.width,
-            y: thisObject.container.frame.height
-        };
+            let visibleHeight = viewPort.visibleArea.bottomRight.y - viewPort.visibleArea.topLeft.y;
 
+            let frameCorner1 = {
+                x: 0,
+                y: 0
+            };
 
-        /* Now the transformations. */
+            let frameCorner2 = {
+                x: thisObject.container.frame.width,
+                y: thisObject.container.frame.height
+            };
 
-        frameCorner1 = transformThisPoint(frameCorner1, thisObject.container.frame.container);
-        frameCorner2 = transformThisPoint(frameCorner2, thisObject.container.frame.container);
+            /* Now the transformations. */
 
-        let frameHeightInViewPort = frameCorner2.y - frameCorner1.y;
+            frameCorner1 = transformThisPoint(frameCorner1, thisObject.container.frame.container);
+            frameCorner2 = transformThisPoint(frameCorner2, thisObject.container.frame.container);
 
-
-        if (stairsArray.length > 0) {
-
-            for (var i = 0; i < stairsArray.length; i++) {
-
-                stairs = stairsArray[i];
-
-                let volumeBarPointA1;
-                let volumeBarPointA2;
-                let volumeBarPointA3;
-                let volumeBarPointA4;
-
-                if (stairs.type === 'buy') {
-
-                    function calculateBuys(plot, height) {
-
-                        volumeBarPointA1 = {
-                            x: stairs.begin + timePeriod / 2,
-                            y: 0
-                        };
-
-                        volumeBarPointA2 = {
-                            x: stairs.begin + timePeriod / 2,
-                            y: stairs.firstAmount * 2
-                        };
-
-                        volumeBarPointA3 = {
-                            x: stairs.end - timePeriod / 2,
-                            y: stairs.lastAmount * 2
-                        };
-
-                        volumeBarPointA4 = {
-                            x: stairs.end - timePeriod / 2,
-                            y: 0
-                        };
+            let frameHeightInViewPort = frameCorner2.y - frameCorner1.y;
 
 
-                        volumeBarPointA1 = plot.transformThisPoint(volumeBarPointA1);
-                        volumeBarPointA2 = plot.transformThisPoint(volumeBarPointA2);
-                        volumeBarPointA3 = plot.transformThisPoint(volumeBarPointA3);
-                        volumeBarPointA4 = plot.transformThisPoint(volumeBarPointA4);
+            if (stairsArray.length > 0) {
 
-                        volumeBarPointA1 = transformThisPoint(volumeBarPointA1, thisObject.container);
-                        volumeBarPointA2 = transformThisPoint(volumeBarPointA2, thisObject.container);
-                        volumeBarPointA3 = transformThisPoint(volumeBarPointA3, thisObject.container);
-                        volumeBarPointA4 = transformThisPoint(volumeBarPointA4, thisObject.container);
+                for (var i = 0; i < stairsArray.length; i++) {
+
+                    stairs = stairsArray[i];
+
+                    let volumeBarPointA1;
+                    let volumeBarPointA2;
+                    let volumeBarPointA3;
+                    let volumeBarPointA4;
+
+                    if (stairs.type === 'buy') {
+
+                        function calculateBuys(plot, height) {
+
+                            volumeBarPointA1 = {
+                                x: stairs.begin + timePeriod / 2,
+                                y: 0
+                            };
+
+                            volumeBarPointA2 = {
+                                x: stairs.begin + timePeriod / 2,
+                                y: stairs.firstAmount * 2
+                            };
+
+                            volumeBarPointA3 = {
+                                x: stairs.end - timePeriod / 2,
+                                y: stairs.lastAmount * 2
+                            };
+
+                            volumeBarPointA4 = {
+                                x: stairs.end - timePeriod / 2,
+                                y: 0
+                            };
 
 
-                        if (volumeBarPointA4.x < viewPort.visibleArea.bottomLeft.x || volumeBarPointA1.x > viewPort.visibleArea.bottomRight.x) {
-                            return false;
+                            volumeBarPointA1 = plot.transformThisPoint(volumeBarPointA1);
+                            volumeBarPointA2 = plot.transformThisPoint(volumeBarPointA2);
+                            volumeBarPointA3 = plot.transformThisPoint(volumeBarPointA3);
+                            volumeBarPointA4 = plot.transformThisPoint(volumeBarPointA4);
+
+                            volumeBarPointA1 = transformThisPoint(volumeBarPointA1, thisObject.container);
+                            volumeBarPointA2 = transformThisPoint(volumeBarPointA2, thisObject.container);
+                            volumeBarPointA3 = transformThisPoint(volumeBarPointA3, thisObject.container);
+                            volumeBarPointA4 = transformThisPoint(volumeBarPointA4, thisObject.container);
+
+
+                            if (volumeBarPointA4.x < viewPort.visibleArea.bottomLeft.x || volumeBarPointA1.x > viewPort.visibleArea.bottomRight.x) {
+                                return false;
+                            }
+
+                            return true;
                         }
 
-                        return true;
+                        if (calculateBuys(timeLineCoordinateSystemFrame, thisObject.container.frame.height) === false) { continue; } // We try to see if it fits in the visible area.
+
+                        if (volumeBarPointA1.y > viewPort.visibleArea.bottomLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
+
+                            if (calculateBuys(timeLineCoordinateSystem, visibleHeight) === false) { continue; }  // We snap t to the view port.
+
+                            /* Now we set the real value of y. */
+
+                            volumeBarPointA1.y = viewPort.visibleArea.bottomRight.y;
+                            volumeBarPointA2.y = viewPort.visibleArea.bottomRight.y - stairs.firstAmount * 2 * timeLineCoordinateSystem.scale.y;
+                            volumeBarPointA3.y = viewPort.visibleArea.bottomRight.y - stairs.lastAmount * 2 * timeLineCoordinateSystem.scale.y;
+                            volumeBarPointA4.y = viewPort.visibleArea.bottomRight.y;
+
+                        }
                     }
 
-                    if (calculateBuys(timeLineCoordinateSystemFrame, thisObject.container.frame.height) === false) { continue; } // We try to see if it fits in the visible area.
+                    let volumeBarPointB1;
+                    let volumeBarPointB2;
+                    let volumeBarPointB3;
+                    let volumeBarPointB4;
 
-                    if (volumeBarPointA1.y > viewPort.visibleArea.bottomLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
+                    if (stairs.type === 'sell') {
 
-                        if (calculateBuys(timeLineCoordinateSystem, visibleHeight) === false) { continue; }  // We snap t to the view port.
+                        function calculateSells(plot, height) {
 
-                        /* Now we set the real value of y. */
+                            volumeBarPointB1 = {
+                                x: stairs.begin + timePeriod / 2,
+                                y: height
+                            };
 
-                        volumeBarPointA1.y = viewPort.visibleArea.bottomRight.y;
-                        volumeBarPointA2.y = viewPort.visibleArea.bottomRight.y - stairs.firstAmount * 2 * timeLineCoordinateSystem.scale.y;
-                        volumeBarPointA3.y = viewPort.visibleArea.bottomRight.y - stairs.lastAmount * 2 * timeLineCoordinateSystem.scale.y;
-                        volumeBarPointA4.y = viewPort.visibleArea.bottomRight.y;
+                            volumeBarPointB2 = {
+                                x: stairs.begin + timePeriod / 2,
+                                y: height - stairs.firstAmount * 2
+                            };
+
+                            volumeBarPointB3 = {
+                                x: stairs.end - timePeriod / 2,
+                                y: height - stairs.lastAmount * 2
+                            };
+
+                            volumeBarPointB4 = {
+                                x: stairs.end - timePeriod / 2,
+                                y: height
+                            };
+
+                            volumeBarPointB1 = plot.transformThisPoint2(volumeBarPointB1);
+                            volumeBarPointB2 = plot.transformThisPoint2(volumeBarPointB2);
+                            volumeBarPointB3 = plot.transformThisPoint2(volumeBarPointB3);
+                            volumeBarPointB4 = plot.transformThisPoint2(volumeBarPointB4);
+
+                            volumeBarPointB1 = transformThisPoint(volumeBarPointB1, thisObject.container);
+                            volumeBarPointB2 = transformThisPoint(volumeBarPointB2, thisObject.container);
+                            volumeBarPointB3 = transformThisPoint(volumeBarPointB3, thisObject.container);
+                            volumeBarPointB4 = transformThisPoint(volumeBarPointB4, thisObject.container);
+
+                        }
+
+                        calculateSells(timeLineCoordinateSystemFrame, thisObject.container.frame.height); // We try to see if it fits in the visible area.
+
+                        if (volumeBarPointB1.y < viewPort.visibleArea.topLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
+
+                            calculateSells(timeLineCoordinateSystem, visibleHeight); // We snap it to the view port.
+
+                            /* Now we set the real value of y. */
+
+                            volumeBarPointB1.y = viewPort.visibleArea.topLeft.y;
+                            volumeBarPointB2.y = viewPort.visibleArea.topLeft.y + stairs.firstAmount * 2 * timeLineCoordinateSystem.scale.y;
+                            volumeBarPointB3.y = viewPort.visibleArea.topLeft.y + stairs.lastAmount * 2 * timeLineCoordinateSystem.scale.y;
+                            volumeBarPointB4.y = viewPort.visibleArea.topLeft.y;
+
+                        }
+                    }
+
+                    /* Everything must fit within the visible area */
+
+                    if (stairs.type === 'buy') {
+
+                        volumeBarPointA1 = viewPort.fitIntoVisibleArea(volumeBarPointA1);
+                        volumeBarPointA2 = viewPort.fitIntoVisibleArea(volumeBarPointA2);
+                        volumeBarPointA3 = viewPort.fitIntoVisibleArea(volumeBarPointA3);
+                        volumeBarPointA4 = viewPort.fitIntoVisibleArea(volumeBarPointA4);
+
+                    } else {
+
+                        volumeBarPointB1 = viewPort.fitIntoVisibleArea(volumeBarPointB1);
+                        volumeBarPointB2 = viewPort.fitIntoVisibleArea(volumeBarPointB2);
+                        volumeBarPointB3 = viewPort.fitIntoVisibleArea(volumeBarPointB3);
+                        volumeBarPointB4 = viewPort.fitIntoVisibleArea(volumeBarPointB4);
 
                     }
-                }
 
-                let volumeBarPointB1;
-                let volumeBarPointB2;
-                let volumeBarPointB3;
-                let volumeBarPointB4;
+                    /* Now the drawing */
 
+                    if (stairs.type === 'buy') {
 
-                if (stairs.type === 'sell') {
+                        browserCanvasContext.beginPath();
 
-                    function calculateSells(plot, height) {
+                        browserCanvasContext.moveTo(volumeBarPointA1.x, volumeBarPointA1.y);
+                        browserCanvasContext.lineTo(volumeBarPointA2.x, volumeBarPointA2.y);
+                        browserCanvasContext.lineTo(volumeBarPointA3.x, volumeBarPointA3.y);
+                        browserCanvasContext.lineTo(volumeBarPointA4.x, volumeBarPointA4.y);
 
-                        volumeBarPointB1 = {
-                            x: stairs.begin + timePeriod / 2,
-                            y: height
-                        };
-
-                        volumeBarPointB2 = {
-                            x: stairs.begin + timePeriod / 2,
-                            y: height - stairs.firstAmount * 2
-                        };
-
-                        volumeBarPointB3 = {
-                            x: stairs.end - timePeriod / 2,
-                            y: height - stairs.lastAmount * 2
-                        };
-
-                        volumeBarPointB4 = {
-                            x: stairs.end - timePeriod / 2,
-                            y: height
-                        };
-
-                        volumeBarPointB1 = plot.transformThisPoint2(volumeBarPointB1);
-                        volumeBarPointB2 = plot.transformThisPoint2(volumeBarPointB2);
-                        volumeBarPointB3 = plot.transformThisPoint2(volumeBarPointB3);
-                        volumeBarPointB4 = plot.transformThisPoint2(volumeBarPointB4);
-
-                        volumeBarPointB1 = transformThisPoint(volumeBarPointB1, thisObject.container);
-                        volumeBarPointB2 = transformThisPoint(volumeBarPointB2, thisObject.container);
-                        volumeBarPointB3 = transformThisPoint(volumeBarPointB3, thisObject.container);
-                        volumeBarPointB4 = transformThisPoint(volumeBarPointB4, thisObject.container);
-
-                    }
-
-                    calculateSells(timeLineCoordinateSystemFrame, thisObject.container.frame.height); // We try to see if it fits in the visible area.
-
-                    if (volumeBarPointB1.y < viewPort.visibleArea.topLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
-
-                        calculateSells(timeLineCoordinateSystem, visibleHeight); // We snap it to the view port.
-
-                        /* Now we set the real value of y. */
-
-                        volumeBarPointB1.y = viewPort.visibleArea.topLeft.y;
-                        volumeBarPointB2.y = viewPort.visibleArea.topLeft.y + stairs.firstAmount * 2 * timeLineCoordinateSystem.scale.y;
-                        volumeBarPointB3.y = viewPort.visibleArea.topLeft.y + stairs.lastAmount * 2 * timeLineCoordinateSystem.scale.y;
-                        volumeBarPointB4.y = viewPort.visibleArea.topLeft.y;
-
-                    }
-                }
+                        browserCanvasContext.closePath();
 
 
-                /* Everything must fit within the visible area */
+                        if (datetime !== undefined) {
 
-                if (stairs.type === 'buy') {
+                            let dateValue = datetime.valueOf();
 
-                    volumeBarPointA1 = viewPort.fitIntoVisibleArea(volumeBarPointA1);
-                    volumeBarPointA2 = viewPort.fitIntoVisibleArea(volumeBarPointA2);
-                    volumeBarPointA3 = viewPort.fitIntoVisibleArea(volumeBarPointA3);
-                    volumeBarPointA4 = viewPort.fitIntoVisibleArea(volumeBarPointA4);
+                            if (dateValue >= stairs.begin && dateValue <= stairs.end) {
 
-                } else {
+                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current bar accroding to time
 
-                    volumeBarPointB1 = viewPort.fitIntoVisibleArea(volumeBarPointB1);
-                    volumeBarPointB2 = viewPort.fitIntoVisibleArea(volumeBarPointB2);
-                    volumeBarPointB3 = viewPort.fitIntoVisibleArea(volumeBarPointB3);
-                    volumeBarPointB4 = viewPort.fitIntoVisibleArea(volumeBarPointB4);
+                            } else {
 
-                }
-
-
-
-                /* Now the drawing */
-
-                if (stairs.type === 'buy') {
-
-                    browserCanvasContext.beginPath();
-
-                    browserCanvasContext.moveTo(volumeBarPointA1.x, volumeBarPointA1.y);
-                    browserCanvasContext.lineTo(volumeBarPointA2.x, volumeBarPointA2.y);
-                    browserCanvasContext.lineTo(volumeBarPointA3.x, volumeBarPointA3.y);
-                    browserCanvasContext.lineTo(volumeBarPointA4.x, volumeBarPointA4.y);
-
-                    browserCanvasContext.closePath();
-
-
-                    if (datetime !== undefined) {
-
-                        let dateValue = datetime.valueOf();
-
-                        if (dateValue >= stairs.begin && dateValue <= stairs.end) {
-
-                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current bar accroding to time
+                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
+                            }
 
                         } else {
 
                             browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
+
                         }
+
+                        browserCanvasContext.fill();
+                        browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.PATINATED_TURQUOISE + ', ' + opacity + ')';
+                        browserCanvasContext.lineWidth = 1;
+                        browserCanvasContext.stroke();
 
                     } else {
 
-                        browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
+                        browserCanvasContext.beginPath();
 
-                    }
+                        browserCanvasContext.moveTo(volumeBarPointB1.x, volumeBarPointB1.y);
+                        browserCanvasContext.lineTo(volumeBarPointB2.x, volumeBarPointB2.y);
+                        browserCanvasContext.lineTo(volumeBarPointB3.x, volumeBarPointB3.y);
+                        browserCanvasContext.lineTo(volumeBarPointB4.x, volumeBarPointB4.y);
 
-                    browserCanvasContext.fill();
-                    browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.PATINATED_TURQUOISE + ', ' + opacity + ')';
-                    browserCanvasContext.lineWidth = 1;
-                    browserCanvasContext.stroke();
+                        browserCanvasContext.closePath();
 
-                } else {
+                        if (datetime !== undefined) {
 
-                    browserCanvasContext.beginPath();
+                            let dateValue = datetime.valueOf();
 
-                    browserCanvasContext.moveTo(volumeBarPointB1.x, volumeBarPointB1.y);
-                    browserCanvasContext.lineTo(volumeBarPointB2.x, volumeBarPointB2.y);
-                    browserCanvasContext.lineTo(volumeBarPointB3.x, volumeBarPointB3.y);
-                    browserCanvasContext.lineTo(volumeBarPointB4.x, volumeBarPointB4.y);
+                            if (dateValue >= stairs.begin && dateValue <= stairs.end) {
 
-                    browserCanvasContext.closePath();
+                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current candle accroding to time
 
-                    if (datetime !== undefined) {
+                            } else {
 
-                        let dateValue = datetime.valueOf();
-
-                        if (dateValue >= stairs.begin && dateValue <= stairs.end) {
-
-                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current candle accroding to time
+                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')';
+                            }
 
                         } else {
 
                             browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')';
+
                         }
 
-                    } else {
+                        browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.RED + ', ' + opacity + ')';
 
-                        browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')';
+                        browserCanvasContext.fill();
+                        browserCanvasContext.lineWidth = 1;
+                        browserCanvasContext.stroke();
+
 
                     }
-
-                    browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.RED + ', ' + opacity + ')';
-
-                    browserCanvasContext.fill();
-                    browserCanvasContext.lineWidth = 1;
-                    browserCanvasContext.stroke();
-
-
                 }
-
-
-
-
             }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] plotChart -> err = " + err); }
 
         }
     }
 
     function onZoomChanged(event) {
 
-        recalculateScaleX();
-        recalculate();
-        recalculateScaleY();
+        try {
 
-    }
-
-    function onDragFinished() {
-
-        recalculateScaleX();
-        recalculate();
-        recalculateScaleY();
-
-    }
-
-    function onOffsetChanged() {
-
-        if (Math.random() * 100 > 95) {
+            if (INFO_LOG === true) { logger.write("[INFO] onZoomChanged -> Entering function."); }
 
             recalculateScaleX();
             recalculate();
             recalculateScaleY();
 
-        };
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onZoomChanged -> err = " + err); }
+
+        }
+    }
+
+    function onDragFinished() {
+
+        try {
+
+            if (INFO_LOG === true) { logger.write("[INFO] onDragFinished -> Entering function."); }
+
+            recalculateScaleX();
+            recalculate();
+            recalculateScaleY();
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onDragFinished -> err = " + err); }
+
+        }
+    }
+
+    function onOffsetChanged() {
+
+        try {
+
+            if (INFO_LOG === true) { logger.write("[INFO] onOffsetChanged -> Entering function."); }
+
+            if (Math.random() * 100 > 95) {
+
+                recalculateScaleX();
+                recalculate();
+                recalculateScaleY();
+
+            };
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onOffsetChanged -> err = " + err); }
+
+        }
     }
 }
 

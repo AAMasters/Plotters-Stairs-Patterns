@@ -1,5 +1,12 @@
 ﻿function newAAMastersPlottersStairsPatternsCandleStairs() {
 
+    const MODULE_NAME = "AAMasters Plotters Stairs Patterns Candle Stairs";
+    const INFO_LOG = false;
+    const ERROR_LOG = true;
+    const INTENSIVE_LOG = false;
+    const logger = newWebDebugLog();
+    logger.fileName = MODULE_NAME;
+
     let thisObject = {
 
         /* Events declared outside the plotter. */
@@ -45,88 +52,119 @@
 
     function initialize(pStorage, pExchange, pMarket, pDatetime, pTimePeriod, callBackFunction) {
 
-        /* Store the information received. */
+        try {
 
-        marketFiles = pStorage.marketFiles[0];
-        dailyFiles = pStorage.dailyFiles[0];
+            if (INFO_LOG === true) { logger.write("[INFO] initialize -> Entering function."); }
 
-        datetime = pDatetime;
-        timePeriod = pTimePeriod;
+            /* Store the information received. */
 
-        /* We need a Market File in order to calculate the Y scale, since this scale depends on actual data. */
+            marketFiles = pStorage.marketFiles[0];
+            dailyFiles = pStorage.dailyFiles[0];
 
-        marketFile = marketFiles.getFile(ONE_DAY_IN_MILISECONDS);  // This file is the one processed faster. 
+            datetime = pDatetime;
+            timePeriod = pTimePeriod;
 
-        recalculateScale();
+            /* We need a Market File in order to calculate the Y scale, since this scale depends on actual data. */
 
-        /* Now we set the right files according to current Period. */
+            marketFile = marketFiles.getFile(ONE_DAY_IN_MILISECONDS);  // This file is the one processed faster. 
 
-        marketFile = marketFiles.getFile(pTimePeriod);
-        fileCursor = dailyFiles.getFileCursor(pTimePeriod);
+            recalculateScale();
 
-        /* Listen to the necesary events. */
+            /* Now we set the right files according to current Period. */
 
-        viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
-        canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
-        viewPort.eventHandler.listenToEvent("Offset Changed", onOffsetChanged);
+            marketFile = marketFiles.getFile(pTimePeriod);
+            fileCursor = dailyFiles.getFileCursor(pTimePeriod);
 
-        /* Get ready for plotting. */
+            /* Listen to the necesary events. */
 
-        recalculate();
+            viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
+            canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
+            viewPort.eventHandler.listenToEvent("Offset Changed", onOffsetChanged);
 
-        callBackFunction();
+            /* Get ready for plotting. */
 
+            recalculate();
+
+            callBackFunction();
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] initialize -> err = " + err); }
+            callBackFunction(GLOBAL.DEFAULT_FAIL_RESPONSE);
+
+        }
     }
 
     function getContainer(point) {
 
-        let container;
+        try {
 
-        /* First we check if this point is inside this space. */
+            if (INFO_LOG === true) { logger.write("[INFO] getContainer -> Entering function."); }
 
-        if (this.container.frame.isThisPointHere(point) === true) {
+            let container;
 
-            return this.container;
+            /* First we check if this point is inside this space. */
 
-        } else {
+            if (this.container.frame.isThisPointHere(point) === true) {
 
-            /* This point does not belong to this space. */
+                return this.container;
 
-            return undefined;
+            } else {
+
+                /* This point does not belong to this space. */
+
+                return undefined;
+            }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] getContainer -> err = " + err); }
+         
         }
-
     }
 
     function setTimePeriod(pTimePeriod) {
 
-        if (timePeriod !== pTimePeriod) {
+        try {
 
-            timePeriod = pTimePeriod;
+            if (INFO_LOG === true) { logger.write("[INFO] setTimePeriod -> Entering function."); }
 
-            if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
+            if (timePeriod !== pTimePeriod) {
 
-                let newMarketFile = marketFiles.getFile(pTimePeriod);
+                timePeriod = pTimePeriod;
 
-                if (newMarketFile !== undefined) {
+                if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
 
-                    marketFile = newMarketFile;
-                    recalculate();
-                }
+                    let newMarketFile = marketFiles.getFile(pTimePeriod);
 
-            } else {
+                    if (newMarketFile !== undefined) {
 
-                let newFileCursor = dailyFiles.getFileCursor(pTimePeriod);
+                        marketFile = newMarketFile;
+                        recalculate();
+                    }
 
-                if (newFileCursor !== undefined) {
+                } else {
 
-                    fileCursor = newFileCursor;
-                    recalculate();
+                    let newFileCursor = dailyFiles.getFileCursor(pTimePeriod);
+
+                    if (newFileCursor !== undefined) {
+
+                        fileCursor = newFileCursor;
+                        recalculate();
+                    }
                 }
             }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] setTimePeriod -> err = " + err); }
+
         }
     }
 
     function setDatetime(pDatetime) {
+
+        if (INFO_LOG === true) { logger.write("[INFO] setDatetime -> Entering function."); }
 
         datetime = pDatetime;
 
@@ -134,345 +172,414 @@
 
     function onDailyFileLoaded(event) {
 
-        if (event.currentValue === event.totalValue) {
+        try {
 
-            /* This happens only when all of the files in the cursor have been loaded. */
+            if (INFO_LOG === true) { logger.write("[INFO] onDailyFileLoaded -> Entering function."); }
 
-            recalculate();
+            if (event.currentValue === event.totalValue) {
+
+                /* This happens only when all of the files in the cursor have been loaded. */
+
+                recalculate();
+
+            }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onDailyFileLoaded -> err = " + err); }
 
         }
     }
 
     function draw() {
 
-        this.container.frame.draw();
+        try {
 
-        plotChart();
+            if (INTENSIVE_LOG === true) { logger.write("[INFO] onDailyFileLoaded -> Entering function."); }
 
+            this.container.frame.draw();
+
+            plotChart();
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] draw -> err = " + err); }
+
+        }
     }
 
     function recalculate() {
 
-        if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
+        try {
 
-            recalculateUsingMarketFiles();
+            if (INFO_LOG === true) { logger.write("[INFO] recalculate -> Entering function."); }
 
-        } else {
+            if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
 
-            recalculateUsingDailyFiles();
+                recalculateUsingMarketFiles();
+
+            } else {
+
+                recalculateUsingDailyFiles();
+
+            }
+
+            thisObject.container.eventHandler.raiseEvent("CandleStairs Changed", stairsArray);
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculate -> err = " + err); }
 
         }
-
-        thisObject.container.eventHandler.raiseEvent("CandleStairs Changed", stairsArray);
     }
 
     function recalculateUsingDailyFiles() {
 
-        if (fileCursor === undefined) { return; } // We need to wait
+        try {
 
-        if (fileCursor.files.size === 0) { return;} // We need to wait until there are files in the cursor
+            if (INFO_LOG === true) { logger.write("[INFO] recalculateUsingDailyFiles -> Entering function."); }
 
-        let daysOnSides = getSideDays(timePeriod);
+            if (fileCursor === undefined) { return; } // We need to wait
 
-        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
-        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
+            if (fileCursor.files.size === 0) { return; } // We need to wait until there are files in the cursor
 
-        let dateDiff = rightDate.valueOf() - leftDate.valueOf();
+            let daysOnSides = getSideDays(timePeriod);
 
-        let farLeftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
-        let farRightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
+            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
+            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
 
-        let currentDate = new Date(farLeftDate.valueOf());
+            let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
-        stairsArray = [];
+            let farLeftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
+            let farRightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
 
-        while (currentDate.valueOf() <= farRightDate.valueOf() + ONE_DAY_IN_MILISECONDS) {
+            let currentDate = new Date(farLeftDate.valueOf());
 
-            let stringDate = currentDate.getFullYear() + '-' + pad(currentDate.getMonth() + 1, 2) + '-' + pad(currentDate.getDate(), 2);
+            stairsArray = [];
 
-            let dailyFile = fileCursor.files.get(stringDate);
+            while (currentDate.valueOf() <= farRightDate.valueOf() + ONE_DAY_IN_MILISECONDS) {
 
-            if (dailyFile !== undefined) {
+                let stringDate = currentDate.getFullYear() + '-' + pad(currentDate.getMonth() + 1, 2) + '-' + pad(currentDate.getDate(), 2);
 
-                for (let i = 0; i < dailyFile.length; i++) {
+                let dailyFile = fileCursor.files.get(stringDate);
 
-                    let stairs = {
-                        open: undefined,
-                        close: undefined,
-                        min: 10000000000000,
-                        max: 0,
-                        begin: undefined,
-                        end: undefined,
-                        direction: undefined,
-                        candleCount: 0,
-                        firstMin: 0,
-                        firstMax: 0,
-                        lastMin: 0,
-                        lastMax: 0
-                    };
+                if (dailyFile !== undefined) {
 
-                    stairs.open = dailyFile[i][0];
-                    stairs.close = dailyFile[i][1];
+                    for (let i = 0; i < dailyFile.length; i++) {
 
-                    stairs.min = dailyFile[i][2];
-                    stairs.max = dailyFile[i][3];
+                        let stairs = {
+                            open: undefined,
+                            close: undefined,
+                            min: 10000000000000,
+                            max: 0,
+                            begin: undefined,
+                            end: undefined,
+                            direction: undefined,
+                            candleCount: 0,
+                            firstMin: 0,
+                            firstMax: 0,
+                            lastMin: 0,
+                            lastMax: 0
+                        };
 
-                    stairs.begin = dailyFile[i][4];
-                    stairs.end = dailyFile[i][5];
+                        stairs.open = dailyFile[i][0];
+                        stairs.close = dailyFile[i][1];
 
-                    stairs.direction = dailyFile[i][6];
-                    stairs.candleCount = dailyFile[i][7];
+                        stairs.min = dailyFile[i][2];
+                        stairs.max = dailyFile[i][3];
 
-                    stairs.firstMin = dailyFile[i][8];
-                    stairs.firstMax = dailyFile[i][9];
+                        stairs.begin = dailyFile[i][4];
+                        stairs.end = dailyFile[i][5];
 
-                    stairs.lastMin = dailyFile[i][10];
-                    stairs.lastMax = dailyFile[i][11];
+                        stairs.direction = dailyFile[i][6];
+                        stairs.candleCount = dailyFile[i][7];
 
-                    if (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) {
+                        stairs.firstMin = dailyFile[i][8];
+                        stairs.firstMax = dailyFile[i][9];
 
-                        stairsArray.push(stairs);
+                        stairs.lastMin = dailyFile[i][10];
+                        stairs.lastMax = dailyFile[i][11];
 
-                        if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+                        if (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) {
 
-                            thisObject.currentStair = stairs;
-                            thisObject.container.eventHandler.raiseEvent("Current Candle-Stairs Changed", thisObject.currentStair);
+                            stairsArray.push(stairs);
 
+                            if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+
+                                thisObject.currentStair = stairs;
+                                thisObject.container.eventHandler.raiseEvent("Current Candle-Stairs Changed", thisObject.currentStair);
+
+                            }
                         }
                     }
                 }
-            } 
 
-            currentDate = new Date(currentDate.valueOf() + ONE_DAY_IN_MILISECONDS);
-        }
-
-        /* Lests check if all the visible screen is going to be covered by candle-stairs. */
-
-        let lowerEnd = leftDate.valueOf();
-        let upperEnd = rightDate.valueOf();
-
-        if (stairsArray.length > 0) {
-
-            if (stairsArray[0].begin > lowerEnd || stairsArray[stairsArray.length - 1].end < upperEnd) {
-
-                setTimeout(recalculate, 2000);
-
-                //console.log("File missing while calculating candle-stairs, scheduling a recalculation in 2 seconds.");
-
+                currentDate = new Date(currentDate.valueOf() + ONE_DAY_IN_MILISECONDS);
             }
-        }
 
+            /* Lests check if all the visible screen is going to be covered by candle-stairs. */
+
+            let lowerEnd = leftDate.valueOf();
+            let upperEnd = rightDate.valueOf();
+
+            if (stairsArray.length > 0) {
+
+                if (stairsArray[0].begin > lowerEnd || stairsArray[stairsArray.length - 1].end < upperEnd) {
+
+                    setTimeout(recalculate, 2000);
+
+                    //console.log("File missing while calculating candle-stairs, scheduling a recalculation in 2 seconds.");
+
+                }
+            }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingDailyFiles -> err = " + err); }
+
+        }
     }
 
     function recalculateUsingMarketFiles() {
 
-        if (marketFile === undefined) { return; } // Initialization not complete yet.
+        try {
 
-        let daysOnSides = getSideDays(timePeriod);
+            if (INFO_LOG === true) { logger.write("[INFO] recalculateUsingMarketFiles -> Entering function."); }
 
-        let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
-        let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
+            if (marketFile === undefined) { return; } // Initialization not complete yet.
 
-        let dateDiff = rightDate.valueOf() - leftDate.valueOf();
+            let daysOnSides = getSideDays(timePeriod);
 
-        leftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
-        rightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
+            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
+            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
 
-        stairsArray = [];
+            let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
-        for (let i = 0; i < marketFile.length; i++) {
+            leftDate = new Date(leftDate.valueOf() - dateDiff * 1.5);
+            rightDate = new Date(rightDate.valueOf() + dateDiff * 1.5);
 
-            let stairs = {
-                open: undefined,
-                close: undefined,
-                min: 10000000000000,
-                max: 0,
-                begin: undefined,
-                end: undefined,
-                direction: undefined,
-                candleCount: 0,
-                firstMin: 0,
-                firstMax: 0,
-                lastMin: 0,
-                lastMax: 0
-            };
+            stairsArray = [];
 
-            stairs.open = marketFile[i][0];
-            stairs.close = marketFile[i][1];
+            for (let i = 0; i < marketFile.length; i++) {
 
-            stairs.min = marketFile[i][2];
-            stairs.max = marketFile[i][3];
+                let stairs = {
+                    open: undefined,
+                    close: undefined,
+                    min: 10000000000000,
+                    max: 0,
+                    begin: undefined,
+                    end: undefined,
+                    direction: undefined,
+                    candleCount: 0,
+                    firstMin: 0,
+                    firstMax: 0,
+                    lastMin: 0,
+                    lastMax: 0
+                };
 
-            stairs.begin = marketFile[i][4];
-            stairs.end = marketFile[i][5];
+                stairs.open = marketFile[i][0];
+                stairs.close = marketFile[i][1];
 
-            stairs.direction = marketFile[i][6];
-            stairs.candleCount = marketFile[i][7];
+                stairs.min = marketFile[i][2];
+                stairs.max = marketFile[i][3];
 
-            stairs.firstMin = marketFile[i][8];
-            stairs.firstMax = marketFile[i][9];
+                stairs.begin = marketFile[i][4];
+                stairs.end = marketFile[i][5];
 
-            stairs.lastMin = marketFile[i][10];
-            stairs.lastMax = marketFile[i][11];
+                stairs.direction = marketFile[i][6];
+                stairs.candleCount = marketFile[i][7];
 
-            if (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) {
+                stairs.firstMin = marketFile[i][8];
+                stairs.firstMax = marketFile[i][9];
 
-                stairsArray.push(stairs);
+                stairs.lastMin = marketFile[i][10];
+                stairs.lastMax = marketFile[i][11];
 
-                if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+                if (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) {
 
-                    thisObject.currentStair = stairs;
-                    thisObject.container.eventHandler.raiseEvent("Current Candle-Stairs Changed", thisObject.currentStair);
+                    stairsArray.push(stairs);
 
+                    if (datetime.valueOf() >= stairs.begin && datetime.valueOf() <= stairs.end) {
+
+                        thisObject.currentStair = stairs;
+                        thisObject.container.eventHandler.raiseEvent("Current Candle-Stairs Changed", thisObject.currentStair);
+
+                    }
                 }
-            } 
+            }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingMarketFiles -> err = " + err); }
+
         }
     }
 
     function recalculateScale() {
 
-        if (marketFile === undefined) { return; } // We need the market file to be loaded to make the calculation.
+        try {
 
-        if (timeLineCoordinateSystem.maxValue > 0) { return; } // Already calculated.
+            if (INFO_LOG === true) { logger.write("[INFO] recalculateScale -> Entering function."); }
 
-        let minValue = {
-            x: EARLIEST_DATE.valueOf(),
-            y: 0
-        };
+            if (marketFile === undefined) { return; } // We need the market file to be loaded to make the calculation.
 
-        let maxValue = {
-            x: MAX_PLOTABLE_DATE.valueOf(),
-            y: nextPorwerOf10(getMaxRate()) / 4 // TODO: This 4 is temporary
-        };
+            if (timeLineCoordinateSystem.maxValue > 0) { return; } // Already calculated.
+
+            let minValue = {
+                x: EARLIEST_DATE.valueOf(),
+                y: 0
+            };
+
+            let maxValue = {
+                x: MAX_PLOTABLE_DATE.valueOf(),
+                y: nextPorwerOf10(getMaxRate()) / 4 // TODO: This 4 is temporary
+            };
 
 
-        timeLineCoordinateSystem.initialize(
-            minValue,
-            maxValue,
-            thisObject.container.frame.width,
-            thisObject.container.frame.height
-        );
+            timeLineCoordinateSystem.initialize(
+                minValue,
+                maxValue,
+                thisObject.container.frame.width,
+                thisObject.container.frame.height
+            );
 
-        function getMaxRate() {
+            function getMaxRate() {
 
-            let maxValue = 0;
+                if (INFO_LOG === true) { logger.write("[INFO] recalculateScale -> getMaxRate -> Entering function."); }
 
-            for (let i = 0; i < marketFile.length; i++) {
+                let maxValue = 0;
 
-                let currentMax = marketFile[i][1];   // 1 = rates.
+                for (let i = 0; i < marketFile.length; i++) {
 
-                if (maxValue < currentMax) {
-                    maxValue = currentMax;
+                    let currentMax = marketFile[i][1];   // 1 = rates.
+
+                    if (maxValue < currentMax) {
+                        maxValue = currentMax;
+                    }
                 }
+
+                return maxValue;
+
             }
 
-            return maxValue;
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScale -> err = " + err); }
 
         }
-
     }
 
     function plotChart() {
 
-        if (stairsArray.length > 0) {
+        try {
 
-            for (var i = 0; i < stairsArray.length; i++) {
+            if (INTENSIVE_LOG === true) { logger.write("[INFO] plotChart -> Entering function."); }
 
-                stairs = stairsArray[i];
+            if (stairsArray.length > 0) {
 
-                let stairsPoint1;
-                let stairsPoint2;
-                let stairsPoint3;
-                let stairsPoint4;
+                for (var i = 0; i < stairsArray.length; i++) {
 
-                if (stairs.direction === 'up') {
+                    stairs = stairsArray[i];
 
-                    stairsPoint1 = {
-                        x: stairs.begin + timePeriod / 7 * 5.5,
-                        y: stairs.firstMin
-                    };
+                    let stairsPoint1;
+                    let stairsPoint2;
+                    let stairsPoint3;
+                    let stairsPoint4;
 
-                    stairsPoint2 = {
-                        x: stairs.end - timePeriod / 7 * 1.5,
-                        y: stairs.lastMin
-                    };
+                    if (stairs.direction === 'up') {
 
-                    stairsPoint3 = {
-                        x: stairs.end - timePeriod / 7 * 5.5,
-                        y: stairs.lastMax
-                    };
+                        stairsPoint1 = {
+                            x: stairs.begin + timePeriod / 7 * 5.5,
+                            y: stairs.firstMin
+                        };
 
-                    stairsPoint4 = {
-                        x: stairs.begin + timePeriod / 7 * 1.5,
-                        y: stairs.firstMax
-                    };
+                        stairsPoint2 = {
+                            x: stairs.end - timePeriod / 7 * 1.5,
+                            y: stairs.lastMin
+                        };
 
-                } else {
+                        stairsPoint3 = {
+                            x: stairs.end - timePeriod / 7 * 5.5,
+                            y: stairs.lastMax
+                        };
 
-                    stairsPoint1 = {
-                        x: stairs.begin + timePeriod / 7 * 1.5,
-                        y: stairs.firstMin
-                    };
+                        stairsPoint4 = {
+                            x: stairs.begin + timePeriod / 7 * 1.5,
+                            y: stairs.firstMax
+                        };
 
-                    stairsPoint2 = {
-                        x: stairs.end - timePeriod / 7 * 5.5,
-                        y: stairs.lastMin
-                    };
+                    } else {
 
-                    stairsPoint3 = {
-                        x: stairs.end - timePeriod / 7 * 1.5,
-                        y: stairs.lastMax
-                    };
+                        stairsPoint1 = {
+                            x: stairs.begin + timePeriod / 7 * 1.5,
+                            y: stairs.firstMin
+                        };
 
-                    stairsPoint4 = {
-                        x: stairs.begin + timePeriod / 7 * 5.5,
-                        y: stairs.firstMax
-                    };
-                }
+                        stairsPoint2 = {
+                            x: stairs.end - timePeriod / 7 * 5.5,
+                            y: stairs.lastMin
+                        };
 
-                stairsPoint1 = timeLineCoordinateSystem.transformThisPoint(stairsPoint1);
-                stairsPoint2 = timeLineCoordinateSystem.transformThisPoint(stairsPoint2);
-                stairsPoint3 = timeLineCoordinateSystem.transformThisPoint(stairsPoint3);
-                stairsPoint4 = timeLineCoordinateSystem.transformThisPoint(stairsPoint4);
+                        stairsPoint3 = {
+                            x: stairs.end - timePeriod / 7 * 1.5,
+                            y: stairs.lastMax
+                        };
 
-                stairsPoint1 = transformThisPoint(stairsPoint1, thisObject.container);
-                stairsPoint2 = transformThisPoint(stairsPoint2, thisObject.container);
-                stairsPoint3 = transformThisPoint(stairsPoint3, thisObject.container);
-                stairsPoint4 = transformThisPoint(stairsPoint4, thisObject.container);
+                        stairsPoint4 = {
+                            x: stairs.begin + timePeriod / 7 * 5.5,
+                            y: stairs.firstMax
+                        };
+                    }
 
-                if (stairsPoint2.x < viewPort.visibleArea.bottomLeft.x || stairsPoint1.x > viewPort.visibleArea.bottomRight.x) {
-                    continue;
-                }
+                    stairsPoint1 = timeLineCoordinateSystem.transformThisPoint(stairsPoint1);
+                    stairsPoint2 = timeLineCoordinateSystem.transformThisPoint(stairsPoint2);
+                    stairsPoint3 = timeLineCoordinateSystem.transformThisPoint(stairsPoint3);
+                    stairsPoint4 = timeLineCoordinateSystem.transformThisPoint(stairsPoint4);
 
-                stairsPoint1 = viewPort.fitIntoVisibleArea(stairsPoint1);
-                stairsPoint2 = viewPort.fitIntoVisibleArea(stairsPoint2);
-                stairsPoint3 = viewPort.fitIntoVisibleArea(stairsPoint3);
-                stairsPoint4 = viewPort.fitIntoVisibleArea(stairsPoint4);
+                    stairsPoint1 = transformThisPoint(stairsPoint1, thisObject.container);
+                    stairsPoint2 = transformThisPoint(stairsPoint2, thisObject.container);
+                    stairsPoint3 = transformThisPoint(stairsPoint3, thisObject.container);
+                    stairsPoint4 = transformThisPoint(stairsPoint4, thisObject.container);
 
-                browserCanvasContext.beginPath();
+                    if (stairsPoint2.x < viewPort.visibleArea.bottomLeft.x || stairsPoint1.x > viewPort.visibleArea.bottomRight.x) {
+                        continue;
+                    }
 
-                browserCanvasContext.moveTo(stairsPoint1.x, stairsPoint1.y);
-                browserCanvasContext.lineTo(stairsPoint2.x, stairsPoint2.y);
-                browserCanvasContext.lineTo(stairsPoint3.x, stairsPoint3.y);
-                browserCanvasContext.lineTo(stairsPoint4.x, stairsPoint4.y);
+                    stairsPoint1 = viewPort.fitIntoVisibleArea(stairsPoint1);
+                    stairsPoint2 = viewPort.fitIntoVisibleArea(stairsPoint2);
+                    stairsPoint3 = viewPort.fitIntoVisibleArea(stairsPoint3);
+                    stairsPoint4 = viewPort.fitIntoVisibleArea(stairsPoint4);
 
-                browserCanvasContext.closePath();
+                    browserCanvasContext.beginPath();
 
-                let opacity = '0.25';
+                    browserCanvasContext.moveTo(stairsPoint1.x, stairsPoint1.y);
+                    browserCanvasContext.lineTo(stairsPoint2.x, stairsPoint2.y);
+                    browserCanvasContext.lineTo(stairsPoint3.x, stairsPoint3.y);
+                    browserCanvasContext.lineTo(stairsPoint4.x, stairsPoint4.y);
 
-                if (stairs.direction === 'up') { browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.PATINATED_TURQUOISE + ', ' + opacity + ')'; }
-                if (stairs.direction === 'down') { browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.RED + ', ' + opacity + ')'; }
+                    browserCanvasContext.closePath();
 
-                if (datetime !== undefined) {
+                    let opacity = '0.25';
 
-                    let dateValue = datetime.valueOf();
+                    if (stairs.direction === 'up') { browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.PATINATED_TURQUOISE + ', ' + opacity + ')'; }
+                    if (stairs.direction === 'down') { browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.RED + ', ' + opacity + ')'; }
 
-                    if (dateValue >= stairs.begin && dateValue <= stairs.end) {
+                    if (datetime !== undefined) {
+
+                        let dateValue = datetime.valueOf();
+
+                        if (dateValue >= stairs.begin && dateValue <= stairs.end) {
 
 
-                        /* highlight the current stairs */
+                            /* highlight the current stairs */
 
-                        browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', 0.1)'; // Current stairs accroding to time
+                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', 0.1)'; // Current stairs accroding to time
+
+                        } else {
+
+                            if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')'; }
+                            if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')'; }
+                        }
 
                     } else {
 
@@ -480,40 +587,66 @@
                         if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')'; }
                     }
 
-                } else {
+                    browserCanvasContext.fill();
 
-                    if (stairs.direction === 'up') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')'; }
-                    if (stairs.direction === 'down') { browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')'; }
+                    browserCanvasContext.lineWidth = 1;
+                    browserCanvasContext.stroke();
                 }
-
-                browserCanvasContext.fill();
-
-                browserCanvasContext.lineWidth = 1;
-                browserCanvasContext.stroke();
             }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] plotChart -> err = " + err); }
 
         }
     }
 
     function onZoomChanged(event) {
 
-        recalculate();
+        try {
 
+            if (INFO_LOG === true) { logger.write("[INFO] onZoomChanged -> Entering function."); }
+
+            recalculate();
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onZoomChanged -> err = " + err); }
+
+        }
     }
 
     function onDragFinished() {
 
-        recalculate();
+        try {
 
+            if (INFO_LOG === true) { logger.write("[INFO] onDragFinished -> Entering function."); }
+
+            recalculate();
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onDragFinished -> err = " + err); }
+
+        }
     }
 
     function onOffsetChanged() {
 
-        if (Math.random() * 100 > 95) {
+        try {
 
-            recalculate()
-        };
+            if (INFO_LOG === true) { logger.write("[INFO] onOffsetChanged -> Entering function."); }
 
+            if (Math.random() * 100 > 95) {
+
+                recalculate()
+            };
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onOffsetChanged -> err = " + err); }
+
+        }
     }
 }
 
