@@ -16,10 +16,12 @@
         // Main functions and properties.
 
         initialize: initialize,
+        finalize: finalize,
         container: undefined,
         getContainer: getContainer,
         setTimePeriod: setTimePeriod,
         setDatetime: setDatetime,
+        recalculateScale: recalculateScale, 
         draw: draw,
 
         // Secondary functions and properties.
@@ -49,6 +51,23 @@
     let stairsArray = [];              // Here we keep the candle-stairs to be ploted every time the Draw() function is called by the AAWebPlatform.
 
     return thisObject;
+
+    function finalize() {
+
+        try {
+
+            if (INFO_LOG === true) { logger.write("[INFO] finalize -> Entering function."); }
+
+            viewPort.eventHandler.stopListening("Zoom Changed", onZoomChanged);
+            canvas.eventHandler.stopListening("Drag Finished", onDragFinished);
+            viewPort.eventHandler.stopListening("Offset Changed", onOffsetChanged);
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] finalize -> err = " + err); }
+
+        }
+    }
 
     function initialize(pStorage, pExchange, pMarket, pDatetime, pTimePeriod, callBackFunction) {
 
