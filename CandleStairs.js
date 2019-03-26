@@ -53,19 +53,31 @@
     return thisObject;
 
     function finalize() {
-
         try {
 
             if (INFO_LOG === true) { logger.write("[INFO] finalize -> Entering function."); }
 
+            /* Stop listening to the necesary events. */
+
             viewPort.eventHandler.stopListening("Zoom Changed", onZoomChanged);
-            canvas.eventHandler.stopListening("Drag Finished", onDragFinished);
             viewPort.eventHandler.stopListening("Offset Changed", onOffsetChanged);
+            marketFiles.eventHandler.stopListening("Files Updated", onFilesUpdated);
+            canvas.eventHandler.stopListening("Drag Finished", onDragFinished);
+
+            /* Destroyd References */
+
+            marketFiles = undefined;
+            dailyFiles = undefined;
+
+            datetime = undefined;
+            timePeriod = undefined;
+
+            marketFile = undefined;
+            fileCursor = undefined;
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] finalize -> err = " + err); }
-
+            if (ERROR_LOG === true) { logger.write("[ERROR] finalize -> err.message = " + err.message); }
         }
     }
 
@@ -97,8 +109,9 @@
             /* Listen to the necesary events. */
 
             viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
-            canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
             viewPort.eventHandler.listenToEvent("Offset Changed", onOffsetChanged);
+            marketFiles.eventHandler.listenToEvent("Files Updated", onFilesUpdated);
+            canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
 
             /* Get ready for plotting. */
 
@@ -139,6 +152,26 @@
 
             if (ERROR_LOG === true) { logger.write("[ERROR] getContainer -> err = " + err); }
          
+        }
+    }
+
+    function onFilesUpdated() {
+
+        try {
+
+            if (INFO_LOG === true) { logger.write("[INFO] onFilesUpdated -> Entering function."); }
+
+            let newMarketFile = marketFiles.getFile(timePeriod);
+
+            if (newMarketFile !== undefined) {
+
+                marketFile = newMarketFile;
+                recalculate();
+            }
+
+        } catch (err) {
+
+            if (ERROR_LOG === true) { logger.write("[ERROR] onFilesUpdated -> err.message = " + err.message); }
         }
     }
 
