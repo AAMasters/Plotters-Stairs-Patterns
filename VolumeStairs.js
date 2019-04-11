@@ -62,6 +62,7 @@
             viewPort.eventHandler.stopListening("Offset Changed", onOffsetChanged);
             marketFiles.eventHandler.stopListening("Files Updated", onFilesUpdated);
             canvas.eventHandler.stopListening("Drag Finished", onDragFinished);
+            thisObject.container.eventHandler.stopListening('Dimmensions Changed')
 
             /* Destroyd References */
 
@@ -116,11 +117,17 @@
             recalculate();
             recalculateScaleY();
 
+            thisObject.container.eventHandler.listenToEvent('Dimmensions Changed', function () {
+                recalculateScaleX();
+                recalculate();
+                recalculateScaleY();
+            })
+
             callBackFunction();
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] initialize -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] initialize -> err = " + err.stack); }
             callBackFunction(GLOBAL.DEFAULT_FAIL_RESPONSE);
 
         }
@@ -157,7 +164,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] getContainer -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] getContainer -> err = " + err.stack); }
 
         }
     }
@@ -216,7 +223,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] setTimePeriod -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] setTimePeriod -> err = " + err.stack); }
 
         }
     }
@@ -247,7 +254,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] onDailyFileLoaded -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] onDailyFileLoaded -> err = " + err.stack); }
 
         }
     }
@@ -264,7 +271,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] draw -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] draw -> err = " + err.stack); }
 
         }
     }
@@ -289,7 +296,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] recalculate -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculate -> err = " + err.stack); }
 
         }
     }
@@ -384,7 +391,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingDailyFiles -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingDailyFiles -> err = " + err.stack); }
 
         }
     }
@@ -447,7 +454,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingMarketFiles -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateUsingMarketFiles -> err = " + err.stack); }
 
         }
     }
@@ -480,7 +487,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleX -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleX -> err = " + err.stack); }
 
         }
     }
@@ -536,14 +543,14 @@
 
                 } catch (err) {
 
-                    if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleY -> getMaxVolume -> err = " + err); }
+                    if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleY -> getMaxVolume -> err = " + err.stack); }
 
                 }
             }
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleY -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] recalculateScaleY -> err = " + err.stack); }
 
         }
     }
@@ -552,7 +559,8 @@
 
         try {
 
-            if (INTENSIVE_LOG === true) { logger.write("[INFO] plotChart -> Entering function."); }
+            let userPosition = getUserPosition()
+            let userPositionDate = userPosition.point.x
 
             let opacity = '0.25';
 
@@ -734,26 +742,12 @@
 
                         browserCanvasContext.closePath();
 
-
-                        if (datetime !== undefined) {
-
-                            let dateValue = datetime.valueOf();
-
-                            if (dateValue >= stairs.begin && dateValue <= stairs.end) {
-
-                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current bar accroding to time
-
-                            } else {
-
-                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
-                            }
-
-                        } else {
-
-                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
-
-                        }
-
+                        browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.GREEN + ', ' + opacity + ')';
+ 
+                        if (userPositionDate >= stairs.begin && userPositionDate <= stairs.end) {
+                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current bar accroding to time
+                        }  
+ 
                         browserCanvasContext.fill();
                         browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.PATINATED_TURQUOISE + ', ' + opacity + ')';
                         browserCanvasContext.lineWidth = 1;
@@ -770,24 +764,9 @@
 
                         browserCanvasContext.closePath();
 
-                        if (datetime !== undefined) {
-
-                            let dateValue = datetime.valueOf();
-
-                            if (dateValue >= stairs.begin && dateValue <= stairs.end) {
-
-                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current candle accroding to time
-
-                            } else {
-
-                                browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')';
-                            }
-
-                        } else {
-
-                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.RUSTED_RED + ', ' + opacity + ')';
-
-                        }
+                        if (userPositionDate >= stairs.begin && userPositionDate <= stairs.end) {
+                            browserCanvasContext.fillStyle = 'rgba(' + UI_COLOR.TITANIUM_YELLOW + ', ' + opacity + ')'; // Current candle accroding to time
+                        }  
 
                         browserCanvasContext.strokeStyle = 'rgba(' + UI_COLOR.RED + ', ' + opacity + ')';
 
@@ -795,14 +774,13 @@
                         browserCanvasContext.lineWidth = 1;
                         browserCanvasContext.stroke();
 
-
                     }
                 }
             }
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] plotChart -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] plotChart -> err = " + err.stack); }
 
         }
     }
@@ -819,7 +797,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] onZoomChanged -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] onZoomChanged -> err = " + err.stack); }
 
         }
     }
@@ -836,7 +814,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] onDragFinished -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] onDragFinished -> err = " + err.stack); }
 
         }
     }
@@ -857,7 +835,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] onOffsetChanged -> err = " + err); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] onOffsetChanged -> err = " + err.stack); }
 
         }
     }
