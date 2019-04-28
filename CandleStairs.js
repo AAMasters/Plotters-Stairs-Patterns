@@ -1,7 +1,6 @@
 ﻿function newAAMastersPlottersStairsPatternsCandleStairs() {
 
     const MODULE_NAME = "AAMasters Plotters Stairs Patterns Candle Stairs";
-    const INFO_LOG = false;
     const ERROR_LOG = true;
     const INTENSIVE_LOG = false;
     const logger = newWebDebugLog();
@@ -61,8 +60,6 @@
     function finalize() {
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] finalize -> Entering function."); }
-
             /* Stop listening to the necesary events. */
 
             viewPort.eventHandler.stopListening(zoomChangedEventSubscriptionId);
@@ -91,8 +88,6 @@
     function initialize(pStorage, pExchange, pMarket, pDatetime, pTimePeriod, callBackFunction) {
 
         try {
-
-            if (INFO_LOG === true) { logger.write("[INFO] initialize -> Entering function."); }
 
             /* Store the information received. */
 
@@ -143,8 +138,6 @@
 
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] getContainer -> Entering function."); }
-
             let container;
 
             /* First we check if this point is inside this space. */
@@ -171,8 +164,6 @@
 
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] onFilesUpdated -> Entering function."); }
-
             let newMarketFile = marketFiles.getFile(timePeriod);
 
             if (newMarketFile !== undefined) {
@@ -190,8 +181,6 @@
     function setTimePeriod(pTimePeriod) {
 
         try {
-
-            if (INFO_LOG === true) { logger.write("[INFO] setTimePeriod -> Entering function."); }
 
             if (timePeriod !== pTimePeriod) {
 
@@ -228,8 +217,6 @@
 
     function setDatetime(pDatetime) {
 
-        if (INFO_LOG === true) { logger.write("[INFO] setDatetime -> Entering function."); }
-
         datetime = pDatetime;
 
     }
@@ -237,8 +224,6 @@
     function onDailyFileLoaded(event) {
 
         try {
-
-            if (INFO_LOG === true) { logger.write("[INFO] onDailyFileLoaded -> Entering function."); }
 
             if (event.currentValue === event.totalValue) {
 
@@ -276,8 +261,6 @@
 
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] recalculate -> Entering function."); }
-
             if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
 
                 recalculateUsingMarketFiles();
@@ -300,8 +283,6 @@
     function recalculateUsingDailyFiles() {
 
         try {
-
-            if (INFO_LOG === true) { logger.write("[INFO] recalculateUsingDailyFiles -> Entering function."); }
 
             if (fileCursor === undefined) { return; } // We need to wait
 
@@ -408,8 +389,6 @@
 
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] recalculateUsingMarketFiles -> Entering function."); }
-
             if (marketFile === undefined) { return; } // Initialization not complete yet.
 
             let daysOnSides = getSideDays(timePeriod);
@@ -483,10 +462,6 @@
 
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] recalculateScale -> Entering function."); }
-
-            if (marketFile === undefined) { return; } // We need the market file to be loaded to make the calculation.
-
             if (timeLineCoordinateSystem.maxValue > 0) { return; } // Already calculated.
 
             let minValue = {
@@ -506,25 +481,6 @@
                 thisObject.container.frame.width,
                 thisObject.container.frame.height
             );
-
-            function getMaxRate() {
-
-                if (INFO_LOG === true) { logger.write("[INFO] recalculateScale -> getMaxRate -> Entering function."); }
-
-                let maxValue = 0;
-
-                for (let i = 0; i < marketFile.length; i++) {
-
-                    let currentMax = marketFile[i][1];   // 1 = rates.
-
-                    if (maxValue < currentMax) {
-                        maxValue = currentMax;
-                    }
-                }
-
-                return maxValue;
-
-            }
 
         } catch (err) {
 
