@@ -14,9 +14,9 @@
 
         // Main functions and properties.
 
+        container: undefined,
         initialize: initialize,
         finalize: finalize,
-        container: undefined,
         getContainer: getContainer,
         setTimePeriod: setTimePeriod,
         setDatetime: setDatetime,
@@ -608,7 +608,6 @@
                             volumeBarPointA2 = transformThisPoint(volumeBarPointA2, thisObject.container);
                             volumeBarPointA3 = transformThisPoint(volumeBarPointA3, thisObject.container);
                             volumeBarPointA4 = transformThisPoint(volumeBarPointA4, thisObject.container);
-
 
                             if (volumeBarPointA4.x < viewPort.visibleArea.bottomLeft.x || volumeBarPointA1.x > viewPort.visibleArea.bottomRight.x) {
                                 return false;

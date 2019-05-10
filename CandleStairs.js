@@ -14,9 +14,9 @@
 
         // Main functions and properties.
 
+        container: undefined,
         initialize: initialize,
         finalize: finalize,
-        container: undefined,
         getContainer: getContainer,
         setTimePeriod: setTimePeriod,
         setDatetime: setDatetime,
@@ -611,7 +611,6 @@
 
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] onZoomChanged -> Entering function."); }
 
             recalculate();
 
@@ -626,8 +625,6 @@
 
         try {
 
-            if (INFO_LOG === true) { logger.write("[INFO] onDragFinished -> Entering function."); }
-
             recalculate();
 
         } catch (err) {
@@ -640,8 +637,6 @@
     function onOffsetChanged() {
 
         try {
-
-            if (INFO_LOG === true) { logger.write("[INFO] onOffsetChanged -> Entering function."); }
 
             if (Math.random() * 100 > 95) {
 
