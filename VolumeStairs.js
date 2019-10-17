@@ -802,16 +802,22 @@
         }
     }
 
-    function onOffsetChanged() {
+    function onOffsetChanged(event) {
 
         try {
 
+            if (event !== undefined) {
+                if (event.recalculate === true) {
+                    recalculateScaleX();
+                    recalculate();
+                    recalculateScaleY();
+                    return
+                }
+            }
             if (Math.random() * 100 > 95) {
-
                 recalculateScaleX();
                 recalculate();
                 recalculateScaleY();
-
             };
 
         } catch (err) {
