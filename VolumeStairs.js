@@ -18,7 +18,7 @@
         initialize: initialize,
         finalize: finalize,
         getContainer: getContainer,
-        setTimePeriod: setTimePeriod,
+        setTimeFrame: setTimeFrame,
         setDatetime: setDatetime,
         recalculateScale: recalculateScale, 
         draw: draw
@@ -33,14 +33,14 @@
     let timeLineCoordinateSystem = newTimeLineCoordinateSystem();       // Needed to be able to plot on the timeline, otherwise not.
     let timeLineCoordinateSystemFrame = newTimeLineCoordinateSystem();  // This chart uses this extra object.
 
-    let timePeriod;                     // This will hold the current Time Period the user is at.
+    let timeFrame;                     // This will hold the current Time Frame the user is at.
     let datetime;                       // This will hold the current Datetime the user is at.
 
     let marketFile;                     // This is the current Market File being plotted.
     let fileCursor;                     // This is the current File Cursor being used to retrieve Daily Files.
 
-    let marketFiles;                      // This object will provide the different Market Files at different Time Periods.
-    let dailyFiles;                // This object will provide the different File Cursors at different Time Periods.
+    let marketFiles;                      // This object will provide the different Market Files at different Time Frames.
+    let dailyFiles;                // This object will provide the different File Cursors at different Time Frames.
 
     let scaleFile;                      // This file is used to calculate the scale.
 
@@ -75,7 +75,7 @@
             dailyFiles = undefined;
 
             datetime = undefined;
-            timePeriod = undefined;
+            timeFrame = undefined;
 
             marketFile = undefined;
             fileCursor = undefined;
@@ -86,7 +86,7 @@
         }
     }
 
-    function initialize(pStorage, pExchange, pMarket, pDatetime, pTimePeriod, callBackFunction) {
+    function initialize(pStorage, pExchange, pMarket, pDatetime, pTimeFrame, callBackFunction) {
 
         try {
 
@@ -96,7 +96,7 @@
             dailyFiles = pStorage.dailyFiles[0];
 
             datetime = pDatetime;
-            timePeriod = pTimePeriod;
+            timeFrame = pTimeFrame;
 
             /* We need a Market File in order to calculate the Y scale, since this scale depends on actual data. */
 
@@ -104,8 +104,8 @@
 
             /* Now we set the right files according to current Period. */
 
-            marketFile = marketFiles.getFile(pTimePeriod);
-            fileCursor = dailyFiles.getFileCursor(pTimePeriod);
+            marketFile = marketFiles.getFile(pTimeFrame);
+            fileCursor = dailyFiles.getFileCursor(pTimeFrame);
 
             /* Listen to the necesary events. */
 
@@ -173,7 +173,7 @@
 
     function onMarketFilesUpdated() {
         try {
-            let newMarketFile = marketFiles.getFile(timePeriod);
+            let newMarketFile = marketFiles.getFile(timeFrame);
             if (newMarketFile !== undefined) {
                 marketFile = newMarketFile;
                 recalculate();
@@ -185,7 +185,7 @@
 
     function onDailyFilesUpdated() {
         try {
-            let newFileCursor = dailyFiles.getFileCursor(timePeriod);
+            let newFileCursor = dailyFiles.getFileCursor(timeFrame);
             if (newFileCursor !== undefined) {
                 fileCursor = newFileCursor;
                 recalculate();
@@ -195,17 +195,17 @@
         }
     }
 
-    function setTimePeriod(pTimePeriod) {
+    function setTimeFrame(pTimeFrame) {
 
         try {
 
-            if (timePeriod !== pTimePeriod) {
+            if (timeFrame !== pTimeFrame) {
 
-                timePeriod = pTimePeriod;
+                timeFrame = pTimeFrame;
 
-                if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
+                if (timeFrame >= _1_HOUR_IN_MILISECONDS) {
 
-                    let newMarketFile = marketFiles.getFile(pTimePeriod);
+                    let newMarketFile = marketFiles.getFile(pTimeFrame);
 
                     if (newMarketFile !== undefined) {
 
@@ -215,7 +215,7 @@
 
                 } else {
 
-                    let newFileCursor = dailyFiles.getFileCursor(pTimePeriod);
+                    let newFileCursor = dailyFiles.getFileCursor(pTimeFrame);
 
                     if (newFileCursor !== undefined) {
 
@@ -227,7 +227,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] setTimePeriod -> err = " + err.stack); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] setTimeFrame -> err = " + err.stack); }
 
         }
     }
@@ -280,7 +280,7 @@
 
         try {
 
-            if (timePeriod >= _1_HOUR_IN_MILISECONDS) {
+            if (timeFrame >= _1_HOUR_IN_MILISECONDS) {
 
                 recalculateUsingMarketFiles();
 
@@ -307,7 +307,7 @@
 
             if (fileCursor.files.size === 0) { return; } // We need to wait until there are files in the cursor
 
-            let daysOnSides = getSideDays(timePeriod);
+            let daysOnSides = getSideDays(timeFrame);
 
             let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
             let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
@@ -398,7 +398,7 @@
 
             if (marketFile === undefined) { return; } // Initialization not complete yet.
 
-            let daysOnSides = getSideDays(timePeriod);
+            let daysOnSides = getSideDays(timeFrame);
 
             let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
             let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
@@ -496,9 +496,9 @@
                 y: 0
             };
 
-            let timePeriodRatio = ONE_DAY_IN_MILISECONDS / timePeriod;
+            let timeFrameRatio = ONE_DAY_IN_MILISECONDS / timeFrame;
 
-            maxValue.y = getMaxVolume() / (timePeriodRatio / 2.5);
+            maxValue.y = getMaxVolume() / (timeFrameRatio / 2.5);
 
             timeLineCoordinateSystem.initializeY(
                 minValue,
@@ -588,22 +588,22 @@
                         function calculateBuys(plot, height) {
 
                             volumeBarPointA1 = {
-                                x: stairs.begin + timePeriod / 2,
+                                x: stairs.begin + timeFrame / 2,
                                 y: 0
                             };
 
                             volumeBarPointA2 = {
-                                x: stairs.begin + timePeriod / 2,
+                                x: stairs.begin + timeFrame / 2,
                                 y: stairs.firstAmount * 2
                             };
 
                             volumeBarPointA3 = {
-                                x: stairs.end - timePeriod / 2,
+                                x: stairs.end - timeFrame / 2,
                                 y: stairs.lastAmount * 2
                             };
 
                             volumeBarPointA4 = {
-                                x: stairs.end - timePeriod / 2,
+                                x: stairs.end - timeFrame / 2,
                                 y: 0
                             };
 
@@ -651,22 +651,22 @@
                         function calculateSells(plot, height) {
 
                             volumeBarPointB1 = {
-                                x: stairs.begin + timePeriod / 2,
+                                x: stairs.begin + timeFrame / 2,
                                 y: height
                             };
 
                             volumeBarPointB2 = {
-                                x: stairs.begin + timePeriod / 2,
+                                x: stairs.begin + timeFrame / 2,
                                 y: height - stairs.firstAmount * 2
                             };
 
                             volumeBarPointB3 = {
-                                x: stairs.end - timePeriod / 2,
+                                x: stairs.end - timeFrame / 2,
                                 y: height - stairs.lastAmount * 2
                             };
 
                             volumeBarPointB4 = {
-                                x: stairs.end - timePeriod / 2,
+                                x: stairs.end - timeFrame / 2,
                                 y: height
                             };
 
