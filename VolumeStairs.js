@@ -30,8 +30,8 @@
     container.initialize();
     thisObject.container = container;
 
-    let timeLineCoordinateSystem = newTimeLineCoordinateSystem();       // Needed to be able to plot on the timeline, otherwise not.
-    let timeLineCoordinateSystemFrame = newTimeLineCoordinateSystem();  // This chart uses this extra object.
+    let coordinateSystem = newCoordinateSystem();       // Needed to be able to plot on the timeline, otherwise not.
+    let coordinateSystemFrame = newCoordinateSystem();  // This chart uses this extra object.
 
     let timeFrame;                     // This will hold the current Time Frame the user is at.
     let datetime;                       // This will hold the current Datetime the user is at.
@@ -309,8 +309,8 @@
 
             let daysOnSides = getSideDays(timeFrame);
 
-            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
-            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
+            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, coordinateSystem);
+            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, coordinateSystem);
 
             let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
@@ -400,8 +400,8 @@
 
             let daysOnSides = getSideDays(timeFrame);
 
-            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, timeLineCoordinateSystem);
-            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, timeLineCoordinateSystem);
+            let leftDate = getDateFromPoint(viewPort.visibleArea.topLeft, thisObject.container, coordinateSystem);
+            let rightDate = getDateFromPoint(viewPort.visibleArea.topRight, thisObject.container, coordinateSystem);
 
             let dateDiff = rightDate.valueOf() - leftDate.valueOf();
 
@@ -465,13 +465,13 @@
                 x: MAX_PLOTABLE_DATE.valueOf()
             };
 
-            timeLineCoordinateSystem.initializeX(
+            coordinateSystem.initializeX(
                 minValue,
                 maxValue,
                 thisObject.container.frame.width
             );
 
-            timeLineCoordinateSystemFrame.initializeX(
+            coordinateSystemFrame.initializeX(
                 minValue,
                 maxValue,
                 thisObject.container.frame.width
@@ -500,13 +500,13 @@
 
             maxValue.y = getMaxVolume() / (timeFrameRatio / 2.5);
 
-            timeLineCoordinateSystem.initializeY(
+            coordinateSystem.initializeY(
                 minValue,
                 maxValue,
                 viewPort.visibleArea.bottomRight.y - viewPort.visibleArea.topLeft.y
             );
 
-            timeLineCoordinateSystemFrame.initializeY(
+            coordinateSystemFrame.initializeY(
                 minValue,
                 maxValue,
                 thisObject.container.frame.height
@@ -625,17 +625,17 @@
                             return true;
                         }
 
-                        if (calculateBuys(timeLineCoordinateSystemFrame, thisObject.container.frame.height) === false) { continue; } // We try to see if it fits in the visible area.
+                        if (calculateBuys(coordinateSystemFrame, thisObject.container.frame.height) === false) { continue; } // We try to see if it fits in the visible area.
 
                         if (volumeBarPointA1.y > viewPort.visibleArea.bottomLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
 
-                            if (calculateBuys(timeLineCoordinateSystem, visibleHeight) === false) { continue; }  // We snap t to the view port.
+                            if (calculateBuys(coordinateSystem, visibleHeight) === false) { continue; }  // We snap t to the view port.
 
                             /* Now we set the real value of y. */
 
                             volumeBarPointA1.y = viewPort.visibleArea.bottomRight.y;
-                            volumeBarPointA2.y = viewPort.visibleArea.bottomRight.y - stairs.firstAmount * 2 * timeLineCoordinateSystem.scale.y;
-                            volumeBarPointA3.y = viewPort.visibleArea.bottomRight.y - stairs.lastAmount * 2 * timeLineCoordinateSystem.scale.y;
+                            volumeBarPointA2.y = viewPort.visibleArea.bottomRight.y - stairs.firstAmount * 2 * coordinateSystem.scale.y;
+                            volumeBarPointA3.y = viewPort.visibleArea.bottomRight.y - stairs.lastAmount * 2 * coordinateSystem.scale.y;
                             volumeBarPointA4.y = viewPort.visibleArea.bottomRight.y;
 
                         }
@@ -682,17 +682,17 @@
 
                         }
 
-                        calculateSells(timeLineCoordinateSystemFrame, thisObject.container.frame.height); // We try to see if it fits in the visible area.
+                        calculateSells(coordinateSystemFrame, thisObject.container.frame.height); // We try to see if it fits in the visible area.
 
                         if (volumeBarPointB1.y < viewPort.visibleArea.topLeft.y && frameHeightInViewPort > visibleHeight * 2 / 3) {
 
-                            calculateSells(timeLineCoordinateSystem, visibleHeight); // We snap it to the view port.
+                            calculateSells(coordinateSystem, visibleHeight); // We snap it to the view port.
 
                             /* Now we set the real value of y. */
 
                             volumeBarPointB1.y = viewPort.visibleArea.topLeft.y;
-                            volumeBarPointB2.y = viewPort.visibleArea.topLeft.y + stairs.firstAmount * 2 * timeLineCoordinateSystem.scale.y;
-                            volumeBarPointB3.y = viewPort.visibleArea.topLeft.y + stairs.lastAmount * 2 * timeLineCoordinateSystem.scale.y;
+                            volumeBarPointB2.y = viewPort.visibleArea.topLeft.y + stairs.firstAmount * 2 * coordinateSystem.scale.y;
+                            volumeBarPointB3.y = viewPort.visibleArea.topLeft.y + stairs.lastAmount * 2 * coordinateSystem.scale.y;
                             volumeBarPointB4.y = viewPort.visibleArea.topLeft.y;
 
                         }
