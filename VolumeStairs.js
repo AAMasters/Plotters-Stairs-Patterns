@@ -17,6 +17,7 @@
         container: undefined,
         initialize: initialize,
         finalize: finalize,
+        fitFunction: undefined,
         getContainer: getContainer,
         setTimeFrame: setTimeFrame,
         setDatetime: setDatetime,
@@ -80,6 +81,7 @@
             marketFile = undefined;
             fileCursor = undefined;
 
+            thisObject.fitFunction = undefined
         } catch (err) {
 
             if (ERROR_LOG === true) { logger.write("[ERROR] finalize -> err.message = " + err.message); }
@@ -707,12 +709,22 @@
                         volumeBarPointA3 = viewPort.fitIntoVisibleArea(volumeBarPointA3);
                         volumeBarPointA4 = viewPort.fitIntoVisibleArea(volumeBarPointA4);
 
+                        volumeBarPointA1 = thisObject.fitFunction(volumeBarPointA1);
+                        volumeBarPointA2 = thisObject.fitFunction(volumeBarPointA2);
+                        volumeBarPointA3 = thisObject.fitFunction(volumeBarPointA3);
+                        volumeBarPointA4 = thisObject.fitFunction(volumeBarPointA4);
+
                     } else {
 
                         volumeBarPointB1 = viewPort.fitIntoVisibleArea(volumeBarPointB1);
                         volumeBarPointB2 = viewPort.fitIntoVisibleArea(volumeBarPointB2);
                         volumeBarPointB3 = viewPort.fitIntoVisibleArea(volumeBarPointB3);
                         volumeBarPointB4 = viewPort.fitIntoVisibleArea(volumeBarPointB4);
+
+                        volumeBarPointB1 = thisObject.fitFunction(volumeBarPointB1);
+                        volumeBarPointB2 = thisObject.fitFunction(volumeBarPointB2);
+                        volumeBarPointB3 = thisObject.fitFunction(volumeBarPointB3);
+                        volumeBarPointB4 = thisObject.fitFunction(volumeBarPointB4);
 
                     }
 

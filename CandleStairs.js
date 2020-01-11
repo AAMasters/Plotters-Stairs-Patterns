@@ -17,6 +17,7 @@
         container: undefined,
         initialize: initialize,
         finalize: finalize,
+        fitFunction: undefined,
         getContainer: getContainer,
         setTimeFrame: setTimeFrame,
         setDatetime: setDatetime,
@@ -81,6 +82,7 @@
             marketFile = undefined;
             fileCursor = undefined;
 
+            thisObject.fitFunction = undefined
         } catch (err) {
 
             if (ERROR_LOG === true) { logger.write("[ERROR] finalize -> err.message = " + err.message); }
@@ -579,6 +581,11 @@
                     stairsPoint2 = viewPort.fitIntoVisibleArea(stairsPoint2);
                     stairsPoint3 = viewPort.fitIntoVisibleArea(stairsPoint3);
                     stairsPoint4 = viewPort.fitIntoVisibleArea(stairsPoint4);
+
+                    stairsPoint1 = thisObject.fitFunction(stairsPoint1);
+                    stairsPoint2 = thisObject.fitFunction(stairsPoint2);
+                    stairsPoint3 = thisObject.fitFunction(stairsPoint3);
+                    stairsPoint4 = thisObject.fitFunction(stairsPoint4);
 
                     browserCanvasContext.beginPath();
 
