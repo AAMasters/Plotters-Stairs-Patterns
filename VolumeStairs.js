@@ -111,8 +111,8 @@
 
             /* Listen to the necesary events. */
 
-            zoomChangedEventSubscriptionId = viewPort.eventHandler.listenToEvent("Zoom Changed", onZoomChanged);
-            offsetChangedEventSubscriptionId = viewPort.eventHandler.listenToEvent("Offset Changed", onOffsetChanged);
+            zoomChangedEventSubscriptionId = viewPort.eventHandler.listenToEvent("Zoom Changed", onViewportZoomChanged);
+            offsetChangedEventSubscriptionId = viewPort.eventHandler.listenToEvent("Position Changed", onViewportPositionChanged);
             dragFinishedEventSubscriptionId = canvas.eventHandler.listenToEvent("Drag Finished", onDragFinished);
             marketFilesUpdatedEventSubscriptionId = marketFiles.eventHandler.listenToEvent("Files Updated", onMarketFilesUpdated);
             dailyFilesUpdatedEventSubscriptionId = dailyFiles.eventHandler.listenToEvent("Files Updated", onDailyFilesUpdated);
@@ -784,7 +784,7 @@
         }
     }
 
-    function onZoomChanged(event) {
+    function onViewportZoomChanged(event) {
 
         try {
 
@@ -794,7 +794,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] onZoomChanged -> err = " + err.stack); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] onViewportZoomChanged -> err = " + err.stack); }
 
         }
     }
@@ -814,7 +814,7 @@
         }
     }
 
-    function onOffsetChanged(event) {
+    function onViewportPositionChanged(event) {
 
         try {
 
@@ -834,7 +834,7 @@
 
         } catch (err) {
 
-            if (ERROR_LOG === true) { logger.write("[ERROR] onOffsetChanged -> err = " + err.stack); }
+            if (ERROR_LOG === true) { logger.write("[ERROR] onViewportPositionChanged -> err = " + err.stack); }
 
         }
     }
