@@ -57,7 +57,9 @@
     let dimmensionsChangedEventSubscriptionId
     let marketFilesUpdatedEventSubscriptionId
     let dailyFilesUpdatedEventSubscriptionId
+    let scaleChangedEventSubscriptionId
 
+    let userPositionDate
     return thisObject;
 
     function finalize() {
@@ -85,6 +87,7 @@
 
             thisObject.fitFunction = undefined
 
+            finalizeCoordinateSystem()
             coordinateSystem = undefined
         } catch (err) {
 
@@ -104,6 +107,7 @@
             datetime = pDatetime;
             timeFrame = pTimeFrame;
             coordinateSystem = pCoordinateSystem
+            initializeCoordinateSystem()
 
             /* We need a Market File in order to calculate the Y scale, since this scale depends on actual data. */
 
@@ -143,6 +147,20 @@
             callBackFunction(GLOBAL.DEFAULT_FAIL_RESPONSE);
 
         }
+    }
+
+    function initializeCoordinateSystem() {
+        scaleChangedEventSubscriptionId = coordinateSystem.eventHandler.listenToEvent('Scale Changed', onScaleChanged)
+    }
+
+    function finalizeCoordinateSystem() {
+        coordinateSystem.eventHandler.stopListening(scaleChangedEventSubscriptionId)
+    }
+
+    function onScaleChanged() {
+        recalculateScaleX();
+        recalculate();
+        recalculateScaleY();
     }
 
     function onMouseOver(event) {
@@ -250,7 +268,9 @@
     }
 
     function setCoordinateSystem(pCoordinateSystem) {
+        finalizeCoordinateSystem()
         coordinateSystem = pCoordinateSystem
+        initializeCoordinateSystem()
     }
 
     function onDailyFileLoaded(event) {
@@ -366,7 +386,10 @@
                         stairs.firstAmount = dailyFile[i][5];
                         stairs.lastAmount = dailyFile[i][6];
 
-                        if (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) {
+                        if (
+                            (stairs.begin >= farLeftDate.valueOf() && stairs.end <= farRightDate.valueOf()) &&
+                            (stairs.begin >= coordinateSystem.min.x && stairs.end <= coordinateSystem.max.x)
+                        ) {
 
                             stairsArray.push(stairs);
 
@@ -447,7 +470,10 @@
                 stairs.firstAmount = marketFile[i][5];
                 stairs.lastAmount = marketFile[i][6];
 
-                if (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) {
+                if (
+                    (stairs.begin >= leftDate.valueOf() && stairs.end <= rightDate.valueOf()) &&
+                    (stairs.begin >= coordinateSystem.min.x && stairs.end <= coordinateSystem.max.x)
+                ) {
 
                     stairsArray.push(stairs);
 
