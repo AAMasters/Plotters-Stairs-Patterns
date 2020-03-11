@@ -23,10 +23,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="AAOlivia-Plotter" />
-    <Folder Include="AAOlivia-Plotter\AAOlivia-Plotter" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="this.plotter.config.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />

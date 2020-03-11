@@ -1,7 +1,7 @@
 {
   "displayName": "Plotters Stairs Patterns",
   "codeName": "PlottersStairsPatterns",
-  "dataMine": "AAMasters",
+  "dataMine": "Masters",
   "modules": [
     {
       "codeName": "CandleStairs",

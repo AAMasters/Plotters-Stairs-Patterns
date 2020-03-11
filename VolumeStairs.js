@@ -1,6 +1,6 @@
-﻿function newAAMastersPlottersStairsPatternsVolumeStairs() {
+﻿function newMastersPlottersStairsPatternsVolumeStairs() {
 
-    const MODULE_NAME = "AAMasters Plotters Stairs Patterns Volume Stairs";
+    const MODULE_NAME = "Masters Plotters Stairs Patterns Volume Stairs";
     const ERROR_LOG = true;
     const INTENSIVE_LOG = false;
     const logger = newWebDebugLog();
